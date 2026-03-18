@@ -15,6 +15,11 @@ services:
     networks:
       - api-monitoring-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d api_monitoring"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 
   mongo:
@@ -44,6 +49,11 @@ services:
     networks:
       - api-monitoring-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
 
   pgadmin:
@@ -72,6 +82,7 @@ volumes:
     driver: local
   pgadmin_data:
     driver: local
+
 
 networks:
   api-monitoring-network:
