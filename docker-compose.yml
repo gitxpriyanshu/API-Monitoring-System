@@ -14,8 +14,23 @@ services:
       - ./scripts/init-postgres.sql:/docker-entrypoint-initdb.d/init-postgres.sql
     restart: unless-stopped
 
+
+  mongo:
+    image: mongo:6.0
+    container_name: api-monitoring-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - api-monitoring-network
+    restart: unless-stopped
+
+
 volumes:
   postgres_data:
+    driver: local
+  mongo_data:
     driver: local
 
 networks:
