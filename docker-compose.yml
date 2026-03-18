@@ -46,12 +46,31 @@ services:
     restart: unless-stopped
 
 
+  pgadmin:
+    image: dpage/pgadmin4:7
+    container_name: api-monitoring-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - api-monitoring-network
+    restart: unless-stopped
+    depends_on:
+      - postgres
+
+
 volumes:
   postgres_data:
     driver: local
   mongo_data:
     driver: local
   rabbitmq_data:
+    driver: local
+  pgadmin_data:
     driver: local
 
 networks:
