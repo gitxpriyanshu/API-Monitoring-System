@@ -37,6 +37,21 @@ class ResponseFormatter {
             timestamp: new Date().toISOString()
         }
     }
+
+    /**
+     * Formats a validation error response with optional error details.
+     * @param {any} error - Additional error details to include in the response (default: null)
+     * @returns {Object} - The formatted validation error response object
+     */
+    static validationError(error = null) {
+        return {
+            success: false,
+            message: 'Validation failed',
+            error,
+            statusCode: 400,
+            timestamp: new Date().toISOString()
+        }
+    }
 }
 
 export default ResponseFormatter;
