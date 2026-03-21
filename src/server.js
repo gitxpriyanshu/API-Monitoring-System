@@ -86,3 +86,12 @@ app.get("/", (req, res) => {
  */
 app.use("/api/auth", authRouter);
 app.use("/api", clientRouter)
+
+/**
+ * 404 Handler
+ */
+app.use((req, res) => {
+    res.status(404).json(ResponseFormatter.error("Endpoint not found", 404))
+})
+
+app.use(errorHandler)
