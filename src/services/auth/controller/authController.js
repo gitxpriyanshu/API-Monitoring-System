@@ -111,4 +111,17 @@ export class AuthController {
     }
 
     /**
+     * Logs out the currently logged-in user.
+     * @param {Request} req - The request object.
+     * @param {Response} res - The response object used to send the response.
+     * @param {Function} next - The next middleware function in the request-response cycle.
+     */
+    async logout(req, res, next) {
+        try {
+            res.clearCookie("authToken")
+            res.status(200).json(ResponseFormatter.success({}, "Logout successful", 200))
+        } catch (error) {
+            next(error)
+        }
+    }
 }
