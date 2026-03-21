@@ -58,3 +58,25 @@ app.get('/health', (req, res) => {
         )
     );
 });
+
+/**
+ * Root endpoint
+ * Provides basic information about the API service and available endpoints.
+ */
+app.get("/", (req, res) => {
+    res.status(200).json(
+        ResponseFormatter.success(
+            {
+                service: 'API Hit Monitoring System',
+                version: '1.0.0',
+                endpoints: {
+                    health: '/health',
+                    auth: '/api/auth',
+                    ingest: '/api/hit',
+                    analytics: '/api/analytics',
+                },
+            },
+            'API Hit Monitoring Service'
+        )
+    )
+});
