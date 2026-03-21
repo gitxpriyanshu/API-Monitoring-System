@@ -30,3 +30,15 @@ app.use(cors({
 app.use(cookieParser())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+/**
+ * Request logging middleware
+ * Logs the HTTP method, path, IP address, and user agent for each incoming request.
+ */
+app.use((req, res, next) => {
+    logger.info(`${req.method} ${req.path}`, {
+        ip: req.ip,
+        userAgent: req.headers['user-agent']
+    });
+    next()
+})
