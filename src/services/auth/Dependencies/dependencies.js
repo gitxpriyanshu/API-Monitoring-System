@@ -18,7 +18,12 @@ class Container {
             authService: new AuthService(repositories.userRepository)
         };
 
-        return { repositories, services }
+        // Initialize controllers
+        const controllers = {
+            authController: new AuthController(services.authService)
+        };
+
+        return { repositories, services, controllers }
     }
 }
 
