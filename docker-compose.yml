@@ -97,7 +97,7 @@ services:
       RATE_LIMIT_WINDOW_MS: 60000
       RATE_LIMIT_MAX_REQUESTS: 100
     ports:
-      - "5000:5000"
+      - "5001:5000"
     volumes:
       - ./logs:/app/logs
     networks:
