@@ -42,3 +42,19 @@ app.use((req, res, next) => {
     });
     next()
 })
+
+/**
+ * Health check endpoint
+ */
+app.get('/health', (req, res) => {
+    res.status(200).json(
+        ResponseFormatter.success(
+            {
+                status: 'healthy',
+                timestamp: new Date().toISOString(),
+                uptime: process.uptime(),
+            },
+            'Service is healthy'
+        )
+    );
+});
