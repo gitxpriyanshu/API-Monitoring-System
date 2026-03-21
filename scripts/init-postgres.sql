@@ -23,3 +23,14 @@ CREATE INDEX IF NOT EXISTS idx_endpoint_metrics_client_id ON endpoint_metrics(cl
 CREATE INDEX IF NOT EXISTS idx_endpoint_metrics_service ON endpoint_metrics(client_id, service_name);
 CREATE INDEX IF NOT EXISTS idx_endpoint_metrics_time ON endpoint_metrics(time_bucket);
 CREATE INDEX IF NOT EXISTS idx_endpoint_metrics_endpoint ON endpoint_metrics(client_id, service_name, endpoint);
+
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+DROP TRIGGER IF EXISTS update_endpoint_metrics_updated_at ON endpoint_metrics;
+CREATE TRIGGER update_endpoint_metrics_updated_at BEFORE UPDATE ON endpoint_metrics FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
