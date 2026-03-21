@@ -95,3 +95,26 @@ app.use((req, res) => {
 })
 
 app.use(errorHandler)
+
+/**
+ * Initialize database connections and start the server
+ */
+async function initializeConnection() {
+    try {
+        logger.info("Initializing database connections...");
+
+        // Connect to MongoDB;
+        await mongodb.connect();
+
+        // Connect to PG;
+        await postgres.testConnection();
+
+        // Connect to RabbitMQ;
+        await rabbitmq.connect();
+
+        logger.info("All connections established successfully");
+    } catch (error) {
+        logger.error("Failed to initialize connections:", error);
+        throw error;
+    }
+}
