@@ -80,3 +80,9 @@ app.get("/", (req, res) => {
         )
     )
 });
+
+/**
+ * API Routes
+ */
+app.use("/api/auth", authRouter);
+app.use("/api", clientRouter)
