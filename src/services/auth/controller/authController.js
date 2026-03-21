@@ -68,4 +68,47 @@ export class AuthController {
         } catch (error) {
             next(error)
         }
+    };
+
+    /**
+     * Logs in a user.
+     * @param {Request} req - The request object containing user credentials.
+     * @param {Response} res - The response object used to send the response.
+     * @param {Function} next - The next middleware function in the request-response cycle.
+     */
+    async login(req, res, next) {
+        try {
+            const { username, password } = req.body;
+            const { user, token } = await this.authService.login(username, password);
+
+            res.cookie("authToken", token, {
+                httpOnly: config.cookie.httpOnly,
+                secure: config.cookie.secure,
+                maxAge: config.cookie.expiresIn
+            });
+
+            res.status(200).json(ResponseFormatter.success(user, "User LoggedIn successfully", 200))
+        } catch (error) {
+            next(error)
+        }
+    };
+
+    /**
+     * Fetches the profile of the logged-in user.
+     * @param {Request} req - The request object containing user details.
+     * @param {Response} res - The response object used to send the response.
+     * @param {Function} next - The next middleware function in the request-response cycle.
+     */
+    async getProfile(req, res, next) {
+        try {
+            const userId = req.user.userId;
+            const result = await this.authService.getProfile(userId);
+
+            res.status(200).json(ResponseFormatter.success(result, "Profile fetched successfully", 200))
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    /**
 }
