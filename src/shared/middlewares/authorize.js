@@ -15,6 +15,15 @@ const authorize = (allowedRoles = []) => (req, res, next) => {
             return res.status(403).json(ResponseFormatter.error("Forbidden", 403))
         }
 
+        // skip
+        if (allowedRoles.length === 0) {
+            next()
+        };
+
+        if (!allowedRoles.includes(req.user.role)) {
+            return res.status(403).json(ResponseFormatter.error("Insufficient permissions", 403))
+        }
+
         next()
     } catch (error) {
         return res.status(403).json(ResponseFormatter.error("Forbidden", 403))
