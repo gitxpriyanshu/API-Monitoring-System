@@ -52,6 +52,28 @@ class ResponseFormatter {
             timestamp: new Date().toISOString()
         }
     }
+
+    /**
+     * Formats a paginated response with data and pagination details.
+     * @param {any} data - The data to include in the response (default: null)
+     * @param {number} page - The current page number
+     * @param {number} limit - The number of items per page
+     * @param {number} total - The total number of items
+     * @returns {Object} - The formatted paginated response object
+     */
+    static paginated(data = null, page, limit, total) {
+        return {
+            success: true,
+            data,
+            pagination: {
+                page,
+                limit,
+                total,
+                totalPages: Math.ceil(total / limit)
+            },
+            timestamp: new Date().toISOString()
+        }
+    }
 }
 
 export default ResponseFormatter;
