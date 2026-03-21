@@ -33,8 +33,19 @@ const authenticate = async (req, res, next) => {
         next()
     } catch (error) {
         logger.error("Authentication failed", {
-    } catch (error) {
-        next(error);
+            error: error.message,
+            path: req.path
+        });
+
+        if (error.name === 'TokenExpiredError') {
+            return res
+                .status(401)
+                .json(ResponseFormatter.error('Token expired', 401));
+        }
+
+        return res
+            .status(401)
+            .json(ResponseFormatter.error('Invalid token', 401));
     }
 }
 
