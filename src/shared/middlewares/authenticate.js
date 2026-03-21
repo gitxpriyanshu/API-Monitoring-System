@@ -22,6 +22,17 @@ const authenticate = async (req, res, next) => {
             return res.status(401).json(ResponseFormatter.error("Authentication token is required", 401))
         }
 
+        const decoded = jwt.verify(token, config.jwt.secret);
+
+        const { userId, email, username, role, clientId } = decoded;
+
+        req.user = {
+            userId, email, username, role, clientId
+        }
+
+        next()
+    } catch (error) {
+        logger.error("Authentication failed", {
     } catch (error) {
         next(error);
     }
