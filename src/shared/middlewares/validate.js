@@ -32,6 +32,15 @@ const validate = (schema) => (req, res, next) => {
             errors.push(`${field} is required`)
             return
         };
+
+        if (rules.minLength && typeof value === 'string' && value.length < rules.minLength) {
+            errors.push(`${field} must be at least ${rules.minLength} characters`);
+        }
+
+        if (rules.custom && typeof rules.custom === 'function') {
+            const customErr = rules.custom(value, body);
+            if (customErr) errors.push(customErr);
+        }
     })
 
     if (errors.length) {
