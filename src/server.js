@@ -118,3 +118,67 @@ async function initializeConnection() {
         throw error;
     }
 }
+
+/**
+ * Start the Express server after establishing database connections.
+ * Also sets up graceful shutdown handlers for SIGINT and SIGTERM signals.
+ * On shutdown, it closes the HTTP server and all database connections before exiting the process.
+ * If any error occurs during startup or shutdown, it logs the error and exits with a non-zero status code.
+ */
+async function startServer() {
+    try {
+        await initializeConnection();
+
+        const server = app.listen(config.port, () => {
+            logger.info(`Server started on port ${config.port}`);
+            logger.info(`Environment: ${config.node_env}`);
+            logger.info(`API available at: http://localhost:${config.port}`);
+        });
+
+
+        const gracefulShutdown = async (signal) => {
+            logger.info(`${signal} received, shutting down gracefully...`);
+
+            server.close(async () => {
+                logger.info("HTTP server closed");
+
+                try {
+                    await mongodb.disconnect();
+                    await postgres.close();
+                    await rabbitmq.close();
+                    logger.info('All connections closed, exiting process');
+                    process.exit(0);
+                } catch (error) {
+                    logger.error('Error during shutdown:', error);
+                    process.exit(1);
+                }
+            })
+
+            setTimeout(() => {
+                logger.error("Forced shutdown")
+                process.exit(1);
+            }, 10000);
+
+        }
+
+        process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+        process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+
+        // Handle uncaught exceptions
+        process.on('uncaughtException', (error) => {
+            logger.error('Uncaught Exception:', error);
+            gracefulShutdown('uncaughtException');
+        });
+
+        process.on('unhandledRejection', (reason, promise) => {
+            logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+            gracefulShutdown('unhandledRejection');
+        });
+
+    } catch (error) {
+        logger.error('Failed to start server:', error);
+        process.exit(1);
+    }
+}
+
+startServer()
