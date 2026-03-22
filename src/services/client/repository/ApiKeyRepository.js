@@ -4,6 +4,7 @@ import BaseApiKeyRepository from "./BaseApiKeyRepository.js"
 
 /**
  * MongoApiKeyRepository class to handle database operations related to API keys
+ * This class extends the BaseApiKeyRepository and provides implementations for creating API keys, finding API keys by value, and finding/counting API keys by client ID. It uses Mongoose for database interactions and includes error handling and logging for each operation.
  */
 class MongoApiKeyRepository extends BaseApiKeyRepository {
     constructor() {
@@ -44,6 +45,43 @@ class MongoApiKeyRepository extends BaseApiKeyRepository {
             return apiKey;
         } catch (error) {
             logger.error('Error finding API key by value:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Find API keys by client ID
+     * @param {string} clientId - Client ID
+     * @param {Object} filters - Additional filters
+     * @returns {Promise<Array>}
+     */
+    async findByClientId(clientId, filters = {}) {
+        try {
+            const query = { clientId, ...filters };
+            const apiKeys = await this.model.find(query)
+                .populate('createdBy', 'username email')
+                .sort({ createdAt: -1 });
+
+            return apiKeys;
+        } catch (error) {
+            logger.error('Error finding API keys by client ID:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Count API keys by client ID
+     * @param {string} clientId - Client ID
+     * @param {Object} filters - Additional filters
+     * @returns {Promise<number>}
+     */
+    async countByClientId(clientId, filters = {}) {
+        try {
+            const query = { clientId, ...filters };
+            const count = await this.model.countDocuments(query);
+            return count;
+        } catch (error) {
+            logger.error('Error counting API keys:', error);
             throw error;
         }
     }
