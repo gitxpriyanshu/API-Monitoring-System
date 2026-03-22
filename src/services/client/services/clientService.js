@@ -105,4 +105,39 @@ export class ClientService {
             throw error;
         }
     };
+
+    generateApiKey() {
+        const prefix = "apim";
+        const randomBytes = crypto.randomBytes(20).toString("hex");
+        return `${prefix}_${randomBytes}`;
+    }
+
+    async createApiKey(clientId, keyData, user) {
+        try {
+            const client = await this.clientRepository.findById(clientId);
+            if (!client) throw new AppError("Client not found", 404);
+
+            if (!this.canUserAccessClient(user, clientId)) {
+                throw new AppError("Access denied", 403);
+            };
+
+            if (!(user.role === APPLICATION_ROLES.SUPER_ADMIN || user.role === APPLICATION_ROLES.CLIENT_ADMIN)) {
+                throw new AppError("Access denied - Only Super Admin and Client Admin can create API keys", 403);
+            };
+
+            const { name, description, environment = "production" } = keyData;
+            const keyId = uudiv4();
+            const keyValue = this.generateApiKey();
+
+            const apiKey = await this.apiKeyRepository.create({
+                keyId, keyValue, clientId, name, description, environment,
+                createdBy: user.userId
+            });
+
+            return apiKey;
+        } catch (error) {
+            logger.error("Error creating API key", error);
+            throw error;
+        }
+    };
 }
