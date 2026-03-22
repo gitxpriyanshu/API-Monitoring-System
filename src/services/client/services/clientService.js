@@ -7,6 +7,7 @@ import crypto from 'crypto';
 
 /**
  * ClientService class to handle business logic related to clients
+ * This class is responsible for creating clients, managing client users, and handling API keys for clients. It interacts with the client repository, API key repository, and user repository to perform these operations.
  */
 export class ClientService {
     constructor(dependencies) {
@@ -140,4 +141,42 @@ export class ClientService {
             throw error;
         }
     };
+
+    async getClientApiKeys(clientId, user) {
+        try {
+            if (!this.canUserAccessClient(user, clientId)) {
+                throw new AppError('Access denied to this client', 403);
+            };
+
+            const apiKeys = await this.apiKeyRepository.findByClientId(clientId);
+
+            const formattedResponse = apiKeys.map(key => {
+                const keyObj = key.toObject ? key.toObject() : key;
+                delete keyObj.keyValue;
+                return keyObj;
+            });
+
+            return formattedResponse;
+        } catch (error) {
+            logger.error('Error getting client API keys:', error);
+            throw error;
+        }
+    };
+
+    async getClientByApiKey(apiKey) {
+        try {
+            const key = await this.apiKeyRepository.findByKeyValue(apiKey);
+
+            if (!key) return null;
+
+            if (key.isExpired()) return null;
+
+            const client = key.clientId;
+
+            return { client, apiKey: key };
+        } catch (error) {
+            logger.error('Error finding client by API key:', error);
+            throw error;
+        }
+    }
 }
