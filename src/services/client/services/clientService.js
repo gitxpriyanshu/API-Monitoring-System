@@ -60,4 +60,49 @@ export class ClientService {
             throw error;
         }
     };
+
+    async createClientUser(clientId, userData, adminUser) {
+        try {
+            if (!this.canUserAccessClient(adminUser, clientId)) {
+                throw new AppError("Access denied", 403)
+            };
+
+            const { username, email, password, role = APPLICATION_ROLES.CLIENT_VIEWER } = userData;
+
+            if (!isValidClientRole(role)) {
+                throw new AppError("Invalid role for client user", 400)
+            };
+
+            const client = await this.clientRepository.findById(clientId);
+            if (!client) {
+                throw new AppError("Client not found", 404)
+            };
+
+            let permissions = {
+                canCreateApiKeys: false,
+                canManageUsers: false,
+                canViewAnalytics: true,
+                canExportData: false,
+            };
+
+            if (role === APPLICATION_ROLES.CLIENT_ADMIN) {
+                permissions = {
+                    canCreateApiKeys: true,
+                    canManageUsers: true,
+                    canViewAnalytics: true,
+                    canExportData: true,
+                }
+            };
+
+            const user = await this.userRepository.create({
+                username, email, password, role, clientId, permissions
+            });
+
+            logger.info("Client user created", { clientId, userId: user._id, role });
+            return this.formatClientForResponse(user);
+        } catch (error) {
+            logger.error("Error creating client user", error);
+            throw error;
+        }
+    };
 }
