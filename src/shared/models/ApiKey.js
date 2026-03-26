@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import SecurityUtils from '../utils/Securityutils.js';
+import SecurityUtils from '../utils/SecurityUtils.js';
 
 /**
  * MongoDB schema for API keys
@@ -130,12 +130,9 @@ apiKeySchema.index({ keyValue: 1, isActive: 1 });
 apiKeySchema.index({ environment: 1, clientId: 1 });
 apiKeySchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 })
 
-/**
- * Check if the API key has expired
- * @returns {boolean}
- */
 apiKeySchema.methods.isExpired = function () {
-    return this.expiresAt && new Date() > this.expiresAt;
+    if (!this.expiresAt) return false;
+    return new Date(this.expiresAt) < new Date();
 };
 
 const ApiKey = mongoose.model('ApiKey', apiKeySchema);
