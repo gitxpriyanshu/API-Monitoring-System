@@ -1,0 +1,36 @@
+import { EVENT_TYPES } from "../eventContracts.js";
+import { isRetryable } from "./RetryStrategy.js"
+
+/**
+ * EventProducer is responsible for publishing events to a RabbitMQ queue with reliability features such as retry logic and circuit breaking. It manages a confirm channel to ensure messages are acknowledged by the broker, and it implements a retry strategy with exponential backoff and jitter to handle transient failures. The producer also tracks metrics for published messages, failed attempts, and exhausted retries, and it provides a shutdown method to gracefully close the channel when the application is terminating.
+ * @class EventProducer
+ * @constructor
+ * @param {Object} dependencies - The dependencies required by the EventProducer.
+ * @param {ConfirmChannelManager} dependencies.channelManager - The channel manager for RabbitMQ.
+ * @param {CircuitBreaker} dependencies.circuitBreaker - The circuit breaker instance.
+ * @param {RetryStrategy} dependencies.retryStrategy - The retry strategy instance.
+ * @param {Object} [dependencies.logger] - Optional logger instance.
+ * @param {string} dependencies.queueName - The name of the RabbitMQ queue.
+ */
+export class EventProducer {
+    constructor({ channelManager, circuitBreaker, retryStrategy, logger, queueName }) {
+        if (!channelManager) throw new Error('EventProducer requires channelManager');
+        if (!circuitBreaker) throw new Error('EventProducer requires circuitBreaker');
+        if (!retryStrategy) throw new Error('EventProducer requires retryStrategy');
+        if (!queueName) throw new Error('EventProducer requires queueName');
+
+        this._channelManager = channelManager;
+        this._circuitBreaker = circuitBreaker;
+        this._retry = retryStrategy;
+        this._logger = logger ?? console;
+        this._queueName = queueName;
+
+        this._metrics = {
+            published: 0,
+            failed: 0,
+            retriesExhausted: 0
+        }
+
+        this._shuttingDown = false
+    }
+}
