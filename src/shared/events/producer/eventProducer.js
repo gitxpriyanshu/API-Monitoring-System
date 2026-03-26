@@ -33,4 +33,40 @@ export class EventProducer {
 
         this._shuttingDown = false
     }
+
+    /**
+     * Increments the specified metric by 1.
+     * @param {string} metric - The name of the metric to increment.
+     * @private
+     */
+    _incrementMetric(metric) {
+        this._metrics[metric] = (this._metrics[metric] || 0) + 1
+    };
+
+    /**
+     * Publishes an API hit event to the RabbitMQ queue.
+     * @param {Object} eventData - The data for the API hit event.
+     * @param {Object} [opts] - Optional parameters for publishing.
+     * @param {string} [opts.correlationId] - Optional correlation ID for the event.
+     * @returns {Promise<boolean>} - Resolves to true if the event was published successfully, false otherwise.
+     */
+    async publishApiHit(eventData, opts = {}) {
+        if (this._shuttingDown) {
+            const error = new Error("EventProducer is shutting down");
+            error.code = 'SHUTDOWN_IN_PROGRESS';
+            this._logger.info('[EventProducer] publish rejected — shutting down', {
+                eventId: eventData.eventId,
+            });
+            throw error;
+        }
+
+        // Check circuit breaker before attempting to publish the event. If the circuit is open, we reject the publish attempt immediately to avoid overwhelming the message broker and to allow it time to recover. This also helps to fail fast and provide quicker feedback to the caller about the unavailability of the service.
+        if (!this._circuitBreaker.allowRequest()) {
+            this._logger.info('[EventProducer] circuit breaker rejected publish', {
+                eventId: eventData.eventId,
+                state: this._circuitBreaker.state,
+            });
+            return false;
+        };
+    }
 }
