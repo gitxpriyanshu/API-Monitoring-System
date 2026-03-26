@@ -113,4 +113,62 @@ export class EventProducer {
             }
         }
     }
+
+
+    /**
+     * Publishes a message to the RabbitMQ queue.
+     * @param {Object} eventData - The data for the event.
+     * @param {Object} param1 - Additional options for publishing.
+     * @param {string} param1.correlationId - The correlation ID for the event.
+     * @param {number} param1.attempt - The current attempt number.
+     * @returns {Promise<void>} - Resolves when the message is successfully published.
+     */
+    async _publish(eventData, { correlationId, attempt }) {
+        const channel = await this._channelManager.getChannel();
+
+        const message = {
+            type: EVENT_TYPES.API_HIT,
+            data: eventData,
+            publishedAt: new Date().toISOString(),
+            attempt: attempt + 1
+        };
+
+        const buffer = Buffer.from(JSON.stringify(message));
+
+        const publishOptions = {
+            persistent: true,
+            contentType: 'application/json',
+            messageId: eventData.eventId,
+            correlationId,
+            timestamp: Math.floor(Date.now() / 1000)
+        };
+
+        return new Promise((resolve, reject) => {
+            const written = channel.publish(
+                '',
+                this._queueName,
+                buffer,
+                publishOptions,
+                (err) => {
+                    if (err) return reject(new Error(`Publish nacked: ${err.message}`));
+                    resolve();
+                }
+            );
+
+            if (!written) {
+                this._logger.info('[EventProducer] back-pressure detected, waiting for drain', {
+                    eventId: eventData.eventId,
+                });
+            }
+
+            const onDrain = () => {
+                channel.removeListener('drain', onDrain);
+                this._logger.debug('[EventProducer] drain event received', {
+                    eventId: eventData.eventId,
+                });
+            }
+
+            channel.once("drain", onDrain)
+        })
+    }
 }
