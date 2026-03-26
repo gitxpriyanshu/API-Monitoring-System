@@ -19,6 +19,34 @@ const validateApiKey = async (req, res, next) => {
                 .status(401)
                 .json(ResponseFormatter.error('API key is required', 401));
         }
+
+        // Get client and API key from database
+        const result = await clientContainer.services.clientServices.getClientByApiKey(apiKey);
+
+        if (!result) {
+            logger.warn('Invalid API key attempted', {
+                path: req.path,
+                ip: req.ip,
+                apiKey: apiKey.substring(0, 8) + '...', // Log partial key for security
+            });
+            return res
+                .status(403)
+                .json(ResponseFormatter.error('Invalid API key', 403));
+        }
+
+        const { client, apiKey: apiKeyObj } = result;
+
+        // Check if client is active
+        if (!client.isActive) {
+            logger.warn('Inactive client attempted API access', {
+                path: req.path,
+                ip: req.ip,
+                clientId: client._id,
+            });
+            return res
+                .status(403)
+                .json(ResponseFormatter.error('Client account is inactive', 403));
+        }
     } catch (error) {
         logger.error('Error validating API key:', error);
         return res
