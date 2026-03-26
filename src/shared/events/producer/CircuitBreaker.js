@@ -200,4 +200,20 @@ export class CircuitBreaker {
         }
     };
 
+    /**
+     * Returns a snapshot of the current state of the circuit breaker.
+     * @returns {{state: string, failures: number, lastFailureTime: number, halfOpenAttempts: number, halfOpenSuccesses: number, cooldownMs: number, failureThreshold: number}} The snapshot of the circuit breaker state.
+     * @private
+     */
+    snapshot() {
+        return {
+            state: this.state,
+            failures: this._failures,
+            lastFailureTime: this._lastFailureTime,
+            halfOpenAttempts: this._halfOpenAttempts,
+            halfOpenSuccesses: this._halfOpenSuccesses,
+            cooldownMs: this.cooldownMs,
+            failureThreshold: this.failureThreshold,
+        };
+    }
 }
