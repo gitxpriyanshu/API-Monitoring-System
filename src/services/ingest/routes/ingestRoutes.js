@@ -20,4 +20,6 @@ const ingestLimiter = rateLimit({
     legacyHeaders: false
 })
 
+router.post("/", validateApiKey, ingestLimiter, (req, res, next) => ingestController.ingestHit(req, res, next))
+
 export default router;
