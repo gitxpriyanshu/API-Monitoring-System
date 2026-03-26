@@ -1,5 +1,5 @@
 import { EVENT_TYPES } from "../eventContracts.js";
-import { isRetryable } from "./RetryStrategy.js"
+import { isRetryable } from "./retryStrategy.js"
 
 /**
  * EventProducer is responsible for publishing events to a RabbitMQ queue with reliability features such as retry logic and circuit breaking. It manages a confirm channel to ensure messages are acknowledged by the broker, and it implements a retry strategy with exponential backoff and jitter to handle transient failures. The producer also tracks metrics for published messages, failed attempts, and exhausted retries, and it provides a shutdown method to gracefully close the channel when the application is terminating.
