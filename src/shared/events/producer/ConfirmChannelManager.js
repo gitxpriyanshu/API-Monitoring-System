@@ -72,6 +72,24 @@ export class ConfirmChannelManager extends EventEmitter {
             // Create a confirm channel
             const confirmChannel = await connection.createConfirmChannel();
 
+            // Listen for 'drain' event to handle back-pressure
+            confirmChannel.on('drain', () => this.emit('drain'));
+
+            confirmChannel.on("close", () => {
+                this._logger.warn('[ChannelManager] confirm channel closed unexpectedly');
+                this._channel = null;
+            })
+
+            confirmChannel.on("error", (err) => {
+                this._logger.error('[ChannelManager] confirm channel error', {
+                    error: err.message,
+                    stack: err.stack,
+                    code: err.code,
+                });
+                this._channel = null;
+                this.emit('error', err)
+            })
+
             this._channel = confirmChannel;
             this._logger.info('[ChannelManager] confirm channel ready');
 
