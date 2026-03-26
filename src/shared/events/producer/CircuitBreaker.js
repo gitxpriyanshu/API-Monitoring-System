@@ -145,4 +145,59 @@ export class CircuitBreaker {
         return false;
     }
 
+    /**
+     * Records a successful request. 
+     * If the circuit breaker is in the HALF_OPEN state, it counts the success and transitions to CLOSED if the required number of successful attempts is reached. If the circuit breaker is in the CLOSED state and there were previous failures, it resets the failure count.
+     * @returns {void}
+     */
+    onSuccess() {
+        this.logger.info('[CircuitBreaker] success recorded', {
+            state: this._state,
+            halfOpenSuccesses: this._halfOpenSuccesses,
+            halfOpenMaxAttempts: this.halfOpenMaxAttempts,
+            failures: this._failures
+        });
+
+        if (this._state === CircuitState.HALF_OPEN) {
+            this._halfOpenSuccesses++;
+            this.logger.info(`[CircuitBreaker] HALF_OPEN success ${this._halfOpenSuccesses}/${this.halfOpenMaxAttempts}`);
+            if (this._halfOpenSuccesses >= this.halfOpenMaxAttempts) {
+                this._reset();
+                this.logger.info('[CircuitBreaker] reset to CLOSED after successful half-open probes');
+            }
+            return;
+        }
+
+        if (this._failures > 0) {
+            this._failures = 0;
+            this.logger.info('[CircuitBreaker] failure counter reset after success');
+        }
+    };
+    /**
+     * Records a failed request. If the circuit breaker is in the HALF_OPEN state, it immediately transitions back to OPEN. If the circuit breaker is in the CLOSED state, it increments the failure count and opens the circuit if the failure threshold is reached.
+     * @returns 
+     */
+    onFailure() {
+        this.logger.error('[CircuitBreaker] failure recorded', {
+            state: this._state,
+            failures: this._failures,
+            failureThreshold: this.failureThreshold
+        });
+
+        // If a failure occurs in HALF_OPEN state, immediately transition back to OPEN
+        if (this._state === CircuitState.HALF_OPEN) {
+            this.logger.warn('[CircuitBreaker] half-open failed, reopening circuit');
+            this._openCircuit();
+            return;
+        }
+
+        this._failures++;
+        this._lastFailureTime = Date.now();
+
+        this.logger.info(`[CircuitBreaker] failure count: ${this._failures}/${this.failureThreshold}`);
+        if (this._failures >= this.failureThreshold) {
+            this._openCircuit();
+        }
+    };
+
 }
