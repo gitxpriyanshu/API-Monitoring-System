@@ -24,3 +24,11 @@ class Container {
         return { services, controllers }
     }
 }
+
+// Initialize the container and export the services and controllers for use in the application
+const container = Container.init();
+export default {
+    ingestService: container.services.ingestService,
+    ingestController: container.controllers.ingestController,
+    Container
+}
