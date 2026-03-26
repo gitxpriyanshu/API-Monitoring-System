@@ -22,4 +22,11 @@ export function createEventProducer(overrides = {}) {
     const log = overrides.logger ?? logger;
     const rmq = overrides.rabbitmq ?? rabbitmq;
     const queueName = overrides.queueName ?? config.rabbitmq.queue;
+
+    // Validate critical dependencies
+    if (!rmq) throw new Error('RabbitMQ connection manager is required');
+    if (!queueName) throw new Error('Queue name must be specified');
+    if (!config.rabbitmq.retryAttempts || config.rabbitmq.retryAttempts < 0) {
+        throw new Error('Invalid retry attempts configuration');
+    }
 }
