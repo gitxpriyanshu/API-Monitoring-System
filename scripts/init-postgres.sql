@@ -1,4 +1,3 @@
--- Table for storing user data
 CREATE TABLE IF NOT EXISTS endpoint_metrics (
     id SERIAL PRIMARY KEY,
     client_id VARCHAR(24) NOT NULL,
