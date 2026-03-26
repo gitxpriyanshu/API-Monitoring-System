@@ -16,6 +16,66 @@ export class IngestService {
     };
 
     /**
+     * Ingests an API hit by validating the hit data and publishing an event to RabbitMQ.
+     * @param {Object} hitData - The API hit data to be ingested.
+     * @returns {Promise<Object>} - The result of the ingestion, including the event ID and status.
+     */
+    async ingestApiHit(hitData) {
+        try {
+            this.validateHitData(hitData);
+
+            const event = {
+                eventId: uuidv4(),
+                timestamp: new Date(),
+                serverName: hitData.serviceName,
+                endpoint: hitData.endpoint,
+                method: hitData.method.toUpperCase(),
+                statusCode: parseInt(hitData.statusCode, 10),
+                latencyMs: parseFloat(hitData.latencyMs),
+                clientId: hitData.clientId,
+                apiKeyId: hitData.apiKeyId,
+                ip: hitData.ip || 'unknown',
+                userAgent: hitData.userAgent || '',
+            }
+
+            const published = await this.eventProducer.publishApiHit(event);
+
+            if (!published) {
+                // Circuit breaker rejected the request
+                logger.warn('API hit rejected by circuit breaker', {
+                    eventId: event.eventId,
+                    endpoint: event.endpoint,
+                    method: event.method,
+                    clientId: event.clientId,
+                });
+
+                return {
+                    eventId: event.eventId,
+                    status: 'rejected',
+                    reason: 'service_unavailable',
+                    timestamp: event.timestamp,
+                };
+            }
+
+            logger.info('API hit ingested', {
+                eventId: event.eventId,
+                endpoint: event.endpoint,
+                method: event.method,
+                clientId: event.clientId,
+            });
+
+            return {
+                eventId: event.eventId,
+                status: 'queued',
+                timestamp: event.timestamp,
+            };
+        } catch (error) {
+            logger.error('Error ingesting API hit:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Validates the API hit data to ensure all required fields are present and valid.
      * @param {Object} hitData - The API hit data to be validated.
      * @throws {AppError} - If any required fields are missing or invalid.
