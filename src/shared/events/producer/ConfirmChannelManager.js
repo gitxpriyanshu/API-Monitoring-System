@@ -23,4 +23,24 @@ export class ConfirmChannelManager extends EventEmitter {
         this._connecting = false;
         this._connectWaiters = [];
     }
+
+    // 100 (a) => 1 => a <== 99 (a)
+    /**
+     * Returns a promise that resolves to a RabbitMQ confirm channel. If the channel is already established, it returns it immediately. 
+     * If the channel is in the process of being established, it waits for that process to complete and then returns the channel. 
+     * If no channel exists and one is not currently being established, it initiates the creation of a new confirm channel.
+     * @returns {Promise<any>} A promise that resolves to a RabbitMQ confirm channel.
+     * @throws Will throw an error if the channel cannot be established after retrying.
+     */
+    async getChannel() {
+        if (this._channel) return this._channel;
+
+        if (this._connecting) {
+            return new Promise((resolve, reject) => {
+                this._connectWaiters.push({ resolve, reject })
+            })
+        }
+
+        return this._connect()
+    }
 }
