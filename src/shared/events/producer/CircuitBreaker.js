@@ -44,4 +44,58 @@ export class CircuitBreaker {
         this._halfOpenSuccesses = 0;
     };
 
+    // Some helper methods
+
+    /**
+     * Checks if the cooldown period has elapsed since the last failure.
+     * @returns {boolean} True if the cooldown period has elapsed, false otherwise.
+     */
+    _cooldownElapsed() {
+        return Date.now() - this._lastFailureTime >= this.cooldownMs;
+    }
+
+    /**
+     * Transitions the circuit breaker to a new state.
+     * @param {CircuitState} newState - The new state to transition to.
+     * @private
+     */
+    _transitionTo(newState) {
+        const prev = this._state;
+        this._state = newState;
+
+        this.logger.info(`[CircuitBreaker] ${prev} => ${newState}`);
+
+        if (newState === CircuitState.HALF_OPEN) {
+            this._halfOpenAttempts = 0;
+            this._halfOpenSuccesses = 0;
+            this.logger.info(`[CircuitBreaker] ${prev} => HALF_OPEN`)
+        }
+
+    }
+
+    /**
+     * Opens the circuit, preventing further requests from being allowed until the cooldown period has elapsed. This method is called when the failure threshold is reached or when a test request in the HALF_OPEN state fails.
+     * @private
+     */
+    _openCircuit() {
+        this._lastFailureTime = Date.now();
+        this._transitionTo(CircuitState.OPEN);
+        this.logger.error('[CircuitBreaker] OPEN', {
+            failures: this._failures,
+            cooldownMs: this.cooldownMs,
+        });
+    }
+
+    /**
+     * Resets the circuit breaker to the CLOSED state, allowing requests to be processed normally. This method is called when a test request in the HALF_OPEN state succeeds or can be called manually for debugging purposes.
+     * @private
+     */
+    _reset() {
+        this._state = CircuitState.CLOSED;
+        this._failures = 0;
+        this._halfOpenAttempts = 0;
+        this._halfOpenSuccesses = 0;
+        this.logger.info('[CircuitBreaker] HALF_OPEN => CLOSED');
+    }
+
 }
