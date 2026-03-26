@@ -47,6 +47,30 @@ const validateApiKey = async (req, res, next) => {
                 .status(403)
                 .json(ResponseFormatter.error('Client account is inactive', 403));
         }
+
+        // Check API key permissions
+        if (!apiKeyObj.permissions?.canIngest) {
+            logger.warn('API key without ingest permission attempted access', {
+                path: req.path,
+                ip: req.ip,
+                apiKeyId: apiKeyObj._id,
+            });
+            return res
+                .status(403)
+                .json(ResponseFormatter.error('API key does not have ingest permissions', 403));
+        }
+
+        // Add client and API key info to request
+        req.client = client;
+        req.apiKey = apiKeyObj;
+
+        logger.debug('API key validated successfully', {
+            clientId: client._id,
+            clientName: client.name,
+            apiKeyId: apiKeyObj._id,
+        });
+
+        next();
     } catch (error) {
         logger.error('Error validating API key:', error);
         return res
