@@ -98,4 +98,51 @@ export class CircuitBreaker {
         this.logger.info('[CircuitBreaker] HALF_OPEN => CLOSED');
     }
 
+    /**
+     * Gets the current state of the circuit breaker.
+     * @returns {CircuitState} The current state of the circuit breaker.
+     */
+    get state() {
+        if (this._state === CircuitState.OPEN && this._cooldownElapsed()) {
+            this._transitionTo(CircuitState.HALF_OPEN);
+        }
+
+        return this._state
+    }
+
+    /**
+     * Determines if a request is allowed based on the current state of the circuit breaker.
+     * @returns {boolean} True if the request is allowed, false otherwise.
+     */
+    allowRequest() {
+        const current = this.state;
+
+        this.logger.debug('[CircuitBreaker] allowRequest check', {
+            state: current,
+            halfOpenAttempts: this._halfOpenAttempts,
+            halfOpenMaxAttempts: this.halfOpenMaxAttempts,
+            halfOpenSuccesses: this._halfOpenSuccesses,
+            failures: this._failures
+        });
+
+        // In CLOSED state, all requests are allowed. 
+        if (current === CircuitState.CLOSED) return true;
+
+        // In OPEN state, no requests are allowed until cooldown has elapsed, then it transitions to HALF_OPEN.
+        if (current === CircuitState.HALF_OPEN) {
+            if (this._halfOpenAttempts < this.halfOpenMaxAttempts) {
+                this._halfOpenAttempts++;
+                this.logger.info(`[CircuitBreaker] allowing HALF_OPEN attempt ${this._halfOpenAttempts}/${this.halfOpenMaxAttempts}`);
+                return true;
+            }
+            this.logger.warn(`[CircuitBreaker] HALF_OPEN attempts exhausted (${this._halfOpenAttempts}/${this.halfOpenMaxAttempts})`);
+            return false;
+        }
+
+        this.logger.info(`[CircuitBreaker] rejecting request, state: ${current}`);
+
+        // In OPEN state, reject all requests until cooldown has elapsed
+        return false;
+    }
+
 }
