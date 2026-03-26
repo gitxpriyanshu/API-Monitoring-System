@@ -68,5 +68,49 @@ export class EventProducer {
             });
             return false;
         };
+
+        const correlationId = opts.correlationId ?? eventData.eventId;
+        const startMs = Date.now();
+        let attempt = 0;
+
+        while (true) {
+            try {
+                await this._publish(eventData, { correlationId, attempt });
+                const latencyMs = Date.now() - startMs;
+                this._circuitBreaker.onSuccess();
+                this._incrementMetric('published');
+
+                this._logger.info('[EventProducer] published', {
+                    eventId: eventData.eventId,
+                    correlationId,
+                    attempt: attempt + 1,
+                    latencyMs,
+                    endpoint: eventData.endpoint,
+                });
+
+                return true;
+            } catch (error) {
+                this._logger.error('[EventProducer] publish attempt failed', {
+                    eventId: eventData.eventId,
+                    correlationId,
+                    attempt: attempt + 1,
+                    error: error.message,
+                });
+
+                const canRetry = isRetryable(error) && this._retry.shouldRetry(attempt);
+
+                if (!canRetry) {
+                    this._circuitBreaker.onFailure();
+                    this._incrementMetric('failed');
+                    if (!this._retry.shouldRetry(attempt)) {
+                        this._incrementMetric('retriesExhausted');
+                    }
+                    throw error
+                };
+
+                await this._retry.wait(attempt);
+                attempt++
+            }
+        }
     }
 }
