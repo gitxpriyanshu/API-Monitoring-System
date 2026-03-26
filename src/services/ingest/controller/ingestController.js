@@ -43,6 +43,22 @@ export class IngestController {
                 endpoint: hitData.endpoint,
                 method: hitData.method
             });
+
+            const result = await this.ingestService.ingestApiHit(hitData);
+
+            if (result.status === 'rejected') {
+                return res.status(503).json(ResponseFormatter.error(
+                    'Service temporarily unavailable',
+                    503,
+                    {
+                        eventId: result.eventId,
+                        reason: result.reason,
+                        retryAfter: '30 seconds'
+                    }
+                ));
+            }
+
+            res.status(202).json(ResponseFormatter.success(result, 'API hit queued for processing', 202))
         } catch (error) {
             next(error)
         }
