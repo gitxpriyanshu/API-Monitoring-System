@@ -171,4 +171,26 @@ export class EventProducer {
             channel.once("drain", onDrain)
         })
     }
+
+    /**
+     * Shuts down the EventProducer by closing the RabbitMQ channel and preventing new publish attempts. This method should be called during application shutdown to ensure that resources are cleaned up properly. Once shutdown is initiated, any new publish attempts will be rejected with an error indicating that the producer is shutting down.
+     */
+    async shutdown() {
+        this._shuttingDown = true;
+        this._logger.info('[EventProducer] shutting down…');
+        await this._channelManager.close();
+        this._logger.info('[EventProducer] shutting completed');
+    };
+
+
+    /**
+     *  Gets the current metrics and circuit breaker state for monitoring purposes. This method can be used to expose an endpoint for health checks or to integrate with monitoring tools to track the performance and reliability of the event producer.
+     * @returns {Object} - An object containing the current metrics and circuit breaker state.
+     */
+    getStats() {
+        return {
+            metrics: { ...this._metrics },
+            circuitBreaker: this._circuitBreaker.snapshot()
+        }
+    }
 }
