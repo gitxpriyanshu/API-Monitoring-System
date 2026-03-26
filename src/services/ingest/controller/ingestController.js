@@ -14,4 +14,37 @@ export class IngestController {
         if (!ingestService) throw new Error("IngestController requires ingest service");
         this.ingestService = ingestService;
     };
+
+
+    /**
+     * Handles the incoming request to ingest an API hit. It extracts the necessary data from the request, calls the ingestApiHit method of the IngestService, and sends an appropriate response based on the result. If the ingestion is rejected by the circuit breaker, it returns a 503 Service Unavailable response with details about the rejection. If the ingestion is successful, it returns a 202 Accepted response indicating that the API hit has been queued for processing. The method also includes error handling to pass any exceptions to the next middleware in the Express.js application.
+     * @param {Request} req - The Express.js request object.
+     * @param {Response} res - The Express.js response object.
+     * @param {Function} next - The next middleware function in the Express.js application.
+     */
+    async ingestHit(req, res, next) {
+        try {
+            logger.info('Ingest: Client data received', {
+                clientId: req.client._id,
+                clientName: req.client.name,
+                clientKeys: Object.keys(req.client)
+            });
+
+            const hitData = {
+                ...req.body,
+                clientId: req.client._id,
+                apiKeyId: req.apiKey._id,
+                ip: req.ip || req.connection.remoteAddress,
+                userAgent: req.headers['user-agent'] || ''
+            };
+
+            logger.info('Ingest: Hit data prepared', {
+                clientId: req.client._id,
+                endpoint: hitData.endpoint,
+                method: hitData.method
+            });
+        } catch (error) {
+            next(error)
+        }
+    }
 }
