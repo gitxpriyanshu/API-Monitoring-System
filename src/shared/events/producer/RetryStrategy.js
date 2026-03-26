@@ -60,4 +60,29 @@ export class RetryStrategy {
     shouldRetry(attempt) {
         return attempt < this.maxRetries;
     };
+
+    /**
+     * Calculates the delay for the next retry attempt using exponential backoff with jitter.
+     * @param {number} attempt - The current attempt count.
+     * @returns {number} - The delay in milliseconds for the next retry attempt.
+     */
+    delay(attempt) {
+        const exponential = this.baseDelayMs * Math.pow(2, attempt);
+        const capped = Math.min(exponential, this.maxDelayMs);
+
+        const jitterRange = capped * this.jitterFactor;
+        const jitter = (Math.random() - 0.5) * 2 * jitterRange;
+
+        return Math.max(0, Math.round(capped + jitter));
+    }
+
+    /**
+     * Waits for the calculated delay before the next retry attempt.
+     * @param {number} attempt - The current attempt count.
+     * @returns {Promise<void>} - Resolves after the delay for the next retry attempt.
+     */
+    wait(attempt) {
+        const ms = this.delay(attempt);
+        return new Promise((resolve) => setTimeout(resolve, ms))
+    }
 }
