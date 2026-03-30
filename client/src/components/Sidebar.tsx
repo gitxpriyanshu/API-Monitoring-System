@@ -29,7 +29,7 @@ export default function Sidebar() {
           <Zap size={22} fill="white" />
         </div>
         <div className="brand">
-          <h3>API Monitor</h3>
+          <h3>API Monitor v1.1</h3>
           <span>By Code Architecture</span>
         </div>
       </div>
