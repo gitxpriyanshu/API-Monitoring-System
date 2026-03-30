@@ -6,7 +6,7 @@ import { useTheme } from '../context/ThemeContext';
 
 export default function Login() {
   const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('Admin@12345!');
+  const [password, setPassword] = useState('admin123');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
@@ -73,7 +73,7 @@ export default function Login() {
           </button>
         </form>
 
-        <p className="hint-text">Default credentials: admin / Admin@12345!</p>
+        <p className="hint-text">Default credentials: admin / admin123</p>
       </div>
 
       <style>{`
