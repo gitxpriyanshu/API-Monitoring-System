@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   BarChart3, 
+  Key,
   Activity, 
   Gauge, 
   Link2, 
@@ -14,6 +15,7 @@ export default function Sidebar() {
   const routes = [
     { path: '/overview', label: 'Overview', icon: <LayoutDashboard size={18} /> },
     { path: '/analytics', label: 'Analytics', icon: <BarChart3 size={18} /> },
+    { path: '/keys', label: 'API Keys', icon: <Key size={18} /> }, // New
     { path: '/realtime', label: 'Real-time', icon: <Activity size={18} /> },
     { path: '/performance', label: 'Performance', icon: <Gauge size={18} /> },
     { path: '/endpoints', label: 'Endpoints', icon: <Link2 size={18} /> },

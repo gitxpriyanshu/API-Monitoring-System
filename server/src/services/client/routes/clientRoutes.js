@@ -20,7 +20,9 @@ router.post("/admin/clients/:clientId/users", (req, res, next) => clientControll
 // Create API key for a client
 router.post("/admin/clients/:clientId/api/keys", (req, res, next) => clientController.createApiKey(req, res, next))
 
-// Get all API keys for a client
-router.get("/admin/clients/:clientId/api/keys", (req, res, next) => clientController.getClientApiKeys(req, res, next))
+// Self-service API key management (based on user's clientId)
+router.get("/keys", (req, res, next) => clientController.getClientApiKeys(req, res, next))
+router.post("/keys", (req, res, next) => clientController.createApiKey(req, res, next))
+router.delete("/keys/:keyId", (req, res, next) => clientController.deleteApiKey(req, res, next))
 
 export default router;

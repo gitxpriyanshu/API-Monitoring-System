@@ -85,6 +85,31 @@ class MongoApiKeyRepository extends BaseApiKeyRepository {
             throw error;
         }
     }
+
+    /**
+     * Find API key by its internal ID
+     */
+    async findById(id) {
+        try {
+            return await this.model.findById(id);
+        } catch (error) {
+            logger.error('Error finding API key by ID:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Delete an API key permanently
+     */
+    async delete(id) {
+        try {
+            await this.model.findByIdAndDelete(id);
+            return true;
+        } catch (error) {
+            logger.error('Error deleting API key from DB:', error);
+            throw error;
+        }
+    }
 }
 
 export default new MongoApiKeyRepository();

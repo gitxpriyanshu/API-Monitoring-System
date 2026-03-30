@@ -152,6 +152,11 @@ export class ClientService {
 
             const formattedResponse = apiKeys.map(key => {
                 const keyObj = key.toObject ? key.toObject() : key;
+                // Mask the key for display: apim_abcd...wxyz
+                const val = keyObj.keyValue;
+                if (val) {
+                    keyObj.maskedValue = `${val.substring(0, 10)}...${val.substring(val.length - 4)}`;
+                }
                 delete keyObj.keyValue;
                 return keyObj;
             });
@@ -162,6 +167,24 @@ export class ClientService {
             throw error;
         }
     };
+
+    async deleteApiKey(keyId, user) {
+        try {
+            const apiKey = await this.apiKeyRepository.findById(keyId);
+            if (!apiKey) throw new AppError("API Key not found", 404);
+
+            if (!this.canUserAccessClient(user, apiKey.clientId)) {
+                throw new AppError("Access denied", 403);
+            };
+
+            await this.apiKeyRepository.delete(keyId);
+            logger.info("API Key revoked", { keyId, userId: user.userId });
+            return true;
+        } catch (error) {
+            logger.error("Error deleting API key", error);
+            throw error;
+        }
+    }
 
     async getClientByApiKey(apiKey) {
         try {
