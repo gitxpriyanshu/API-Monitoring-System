@@ -33,7 +33,7 @@ app.use(ApiMonitor({
 
 app.use(helmet());
 app.use(cors({
-    origin: true,
+    origin: ['https://client-orcin-pi.vercel.app', 'http://localhost:5173'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key']
 }));
