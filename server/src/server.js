@@ -34,7 +34,8 @@ app.use(ApiMonitor({
 app.use(helmet());
 app.use(cors({
     origin: true,
-    credentials: true
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key']
 }));
 app.use(cookieParser())
 app.use(express.json());
