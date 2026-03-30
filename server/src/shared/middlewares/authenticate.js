@@ -3,13 +3,7 @@ import ResponseFormatter from "../utils/responseFormatter.js";
 import jwt from "jsonwebtoken";
 import logger from "../config/logger.js"
 
-/**
- * Middleware to authenticate requests using JWT.
- * @param {Request} req - The request object.
- * @param {Response} res - The response object.
- * @param {Function} next - The next middleware function.
- * @returns {Promise<void>}
- */
+
 const authenticate = async (req, res, next) => {
     try {
         let token = null;

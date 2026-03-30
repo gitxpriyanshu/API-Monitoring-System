@@ -2,10 +2,7 @@ import config from "../../../shared/config/index.js";
 import { APPLICATION_ROLES } from "../../../shared/constants/roles.js";
 import ResponseFormatter from "../../../shared/utils/responseFormatter.js"
 
-/**
- * @description AuthController handles user authentication and authorization related operations such as onboarding super admin, user registration, login, fetching user profile, and logout.
- * It interacts with the AuthService to perform these operations and formats the responses using ResponseFormatter.
- */
+
 export class AuthController {
     constructor(authService) {
         if (!authService) {
@@ -15,12 +12,7 @@ export class AuthController {
         this.authService = authService
     };
 
-    /**
-     * Onboards a new super admin user.
-     * @param {Request} req - The request object containing user details.
-     * @param {Response} res - The response object used to send the response.
-     * @param {Function} next - The next middleware function in the request-response cycle.
-     */
+    
     async onboardSuperAdmin(req, res, next) {
         try {
             const { username, email, password } = req.body;
@@ -44,12 +36,7 @@ export class AuthController {
         }
     };
 
-    /**
-     * Registers a new user.
-     * @param {Request} req - The request object containing user details.
-     * @param {Response} res - The response object used to send the response.
-     * @param {Function} next - The next middleware function in the request-response cycle.
-     */
+    
     async register(req, res, next) {
         try {
             const { username, email, password, role } = req.body;
@@ -72,12 +59,7 @@ export class AuthController {
         }
     };
 
-    /**
-     * Logs in a user.
-     * @param {Request} req - The request object containing user credentials.
-     * @param {Response} res - The response object used to send the response.
-     * @param {Function} next - The next middleware function in the request-response cycle.
-     */
+    
     async login(req, res, next) {
         try {
             const { username, password } = req.body;
@@ -96,12 +78,7 @@ export class AuthController {
         }
     };
 
-    /**
-     * Fetches the profile of the logged-in user.
-     * @param {Request} req - The request object containing user details.
-     * @param {Response} res - The response object used to send the response.
-     * @param {Function} next - The next middleware function in the request-response cycle.
-     */
+    
     async getProfile(req, res, next) {
         try {
             const userId = req.user.userId;
@@ -113,12 +90,7 @@ export class AuthController {
         }
     }
 
-    /**
-     * Logs out the currently logged-in user.
-     * @param {Request} req - The request object.
-     * @param {Response} res - The response object used to send the response.
-     * @param {Function} next - The next middleware function in the request-response cycle.
-     */
+    
     async logout(req, res, next) {
         try {
             res.clearCookie("authToken", {

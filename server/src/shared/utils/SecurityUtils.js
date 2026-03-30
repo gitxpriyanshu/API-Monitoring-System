@@ -1,11 +1,8 @@
 
-/**
- * SecurityUtils - Utility class for security-related functions such as password validation.
- * This class can be extended in the future to include additional security features like token generation, encryption, etc.
- */
+
 class SecurityUtils {
 
-    // Password requirements can be configured via environment variables
+    
     static PASSWORD_REQUIREMENTS = {
         minLength: parseInt(process.env.PASSWORD_MIN_LENGTH || '8'),
         requireUppercase: (process.env.PASSWORD_REQUIRE_UPPERCASE || 'true') === 'true',
@@ -14,11 +11,7 @@ class SecurityUtils {
         requireSymbols: (process.env.PASSWORD_REQUIRE_SYMBOLS || 'true') === 'true',
     };
 
-    /**
-     * Validates a password against the defined security requirements.
-     * @param {string} password 
-     * @returns {Object} - Validation res. with success flag and errors
-     */
+    
     static validatePassword(password) {
         const errors = [];
         const requirements = this.PASSWORD_REQUIREMENTS;
@@ -50,7 +43,7 @@ class SecurityUtils {
             errors.push('Password must contain at least one special character');
         }
 
-        // Check for common weak passwords
+        
         const weakPasswords = [
             'password', '123456', 'qwerty', 'admin', 'letmein',
             'password123', 'admin123', '12345678', 'welcome'

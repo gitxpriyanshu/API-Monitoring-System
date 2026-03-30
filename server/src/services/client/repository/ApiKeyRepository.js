@@ -2,20 +2,13 @@ import logger from "../../../shared/config/logger.js";
 import ApiKey from "../../../shared/models/ApiKey.js"
 import BaseApiKeyRepository from "./BaseApikeyRepository.js"
 
-/**
- * MongoApiKeyRepository class to handle database operations related to API keys
- * This class extends the BaseApiKeyRepository and provides implementations for creating API keys, finding API keys by value, and finding/counting API keys by client ID. It uses Mongoose for database interactions and includes error handling and logging for each operation.
- */
+
 class MongoApiKeyRepository extends BaseApiKeyRepository {
     constructor() {
         super(ApiKey)
     }
 
-    /**
-     * Create a new API key
-     * @param {Object} apiKeyData - API key data
-     * @returns {Promise<Object>}
-     */
+    
     async create(apiKeyData) {
         try {
             const apiKey = new this.model(apiKeyData);
@@ -28,12 +21,7 @@ class MongoApiKeyRepository extends BaseApiKeyRepository {
         }
     }
 
-    /**
-     * Find API key by key value
-     * @param {string} keyValue - API key value
-     * @param {boolean} includeInactive - Include inactive keys
-     * @returns {Promise<Object|null>}
-     */
+    
     async findByKeyValue(keyValue, includeInactive = false) {
         try {
             const filter = { keyValue };
@@ -49,12 +37,7 @@ class MongoApiKeyRepository extends BaseApiKeyRepository {
         }
     }
 
-    /**
-     * Find API keys by client ID
-     * @param {string} clientId - Client ID
-     * @param {Object} filters - Additional filters
-     * @returns {Promise<Array>}
-     */
+    
     async findByClientId(clientId, filters = {}) {
         try {
             const query = { clientId, ...filters };
@@ -69,12 +52,7 @@ class MongoApiKeyRepository extends BaseApiKeyRepository {
         }
     }
 
-    /**
-     * Count API keys by client ID
-     * @param {string} clientId - Client ID
-     * @param {Object} filters - Additional filters
-     * @returns {Promise<number>}
-     */
+    
     async countByClientId(clientId, filters = {}) {
         try {
             const query = { clientId, ...filters };
@@ -86,9 +64,7 @@ class MongoApiKeyRepository extends BaseApiKeyRepository {
         }
     }
 
-    /**
-     * Find API key by its internal ID
-     */
+    
     async findById(id) {
         try {
             return await this.model.findById(id);
@@ -98,9 +74,7 @@ class MongoApiKeyRepository extends BaseApiKeyRepository {
         }
     }
 
-    /**
-     * Delete an API key permanently
-     */
+    
     async delete(id) {
         try {
             await this.model.findByIdAndDelete(id);

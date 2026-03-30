@@ -2,11 +2,7 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs"
 import SecurityUtils from "../utils/SecurityUtils.js";
 
-/**
- * User Schema - Represents a user in the system with authentication and role-based access control.
- * Each user can be associated with a client (except super_admin) and has specific permissions.
- * Passwords are hashed before saving to the database for security.
- */
+
 const userSchema = new mongoose.Schema({
     username: {
         type: String,
@@ -49,8 +45,8 @@ const userSchema = new mongoose.Schema({
             message: function (props) {
                 if (props.value && !props.value.startsWith('$2a$')) {
                     const validation = SecurityUtils.validatePassword(props.value)
-                    // ["Password is required", "Password must contain at least one uppercase letter"]
-                    // "Password is required. Password must contain at least one uppercase letter."
+                    
+                    
                     return validation.errors.join(". ");
                 };
                 return "Password validation failed"
@@ -63,7 +59,7 @@ const userSchema = new mongoose.Schema({
         default: 'client_viewer'
     },
     clientId: {
-        type: mongoose.Schema.Types.ObjectId, // 123
+        type: mongoose.Schema.Types.ObjectId, 
         ref: "Client",
         required: function () {
             return this.role !== "super_admin"
@@ -96,7 +92,7 @@ const userSchema = new mongoose.Schema({
     collection: "users"
 })
 
-// Hash password before saving
+
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) {
         return next();
@@ -111,7 +107,7 @@ userSchema.pre('save', async function (next) {
     }
 });
 
-// Indexes for efficient querying
+
 userSchema.index({ clientId: 1, isActive: 1 });
 userSchema.index({ role: 1 })
 

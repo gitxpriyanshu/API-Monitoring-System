@@ -5,10 +5,7 @@ import AppError from "../../../shared/utils/AppError.js";
 import { v4 as uudiv4 } from "uuid";
 import crypto from 'crypto';
 
-/**
- * ClientService class to handle business logic related to clients
- * This class is responsible for creating clients, managing client users, and handling API keys for clients. It interacts with the client repository, API key repository, and user repository to perform these operations.
- */
+
 export class ClientService {
     constructor(dependencies) {
         if (!dependencies) throw new Error('Dependencies are required');
@@ -152,7 +149,7 @@ export class ClientService {
 
             const formattedResponse = apiKeys.map(key => {
                 const keyObj = key.toObject ? key.toObject() : key;
-                // Mask the key for display: apim_abcd...wxyz
+                
                 const val = keyObj.keyValue;
                 if (val) {
                     keyObj.maskedValue = `${val.substring(0, 10)}...${val.substring(val.length - 4)}`;

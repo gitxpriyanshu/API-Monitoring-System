@@ -2,18 +2,13 @@ import mongoose from "mongoose"
 import config from "./index.js"
 import logger from "./logger.js"
 
-/**
- * MongoDB database manager/connector
- */
+
 class MongoConnection {
     constructor() {
         this.connection = null;
     }
 
-    /**
-     * Connect to MongoDB
-     * @returns {Promise<mongoose.Connection>}
-     */
+    
     async connect() {
         try {
             if (this.connection) {
@@ -44,9 +39,7 @@ class MongoConnection {
         }
     }
 
-    /**
-     * This helps to disconnet the active mongodb connection
-     */
+    
     async disconnect() {
         try {
             if (this.connection) {
@@ -60,10 +53,7 @@ class MongoConnection {
         }
     }
 
-    /**
-     * Get the active connection
-     * @returns {mongoose.Connection}
-     */
+    
     getConnection() {
         return this.connection;
     }

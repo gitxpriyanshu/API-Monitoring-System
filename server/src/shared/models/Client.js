@@ -1,9 +1,6 @@
 import mongoose from 'mongoose';
 
-/**
- * MongoDB schema for clients/organizations
- * Each client represents a business/organization using the monitoring service
- */
+
 const clientSchema = new mongoose.Schema(
     {
         name: {

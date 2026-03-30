@@ -1,9 +1,6 @@
 import mongoose from 'mongoose';
 
-/**
- * MongoDB schema for raw API hit events
- * Stores every individual API call
- */
+
 const apiHitSchema = new mongoose.Schema(
     {
         eventId: {
@@ -67,7 +64,7 @@ const apiHitSchema = new mongoose.Schema(
     }
 );
 
-// Create compound indexes for common queries
+
 apiHitSchema.index({ clientId: 1, serviceName: 1, endpoint: 1, timestamp: -1 });
 apiHitSchema.index({ clientId: 1, timestamp: -1, statusCode: 1 });
 apiHitSchema.index({ apiKeyId: 1, timestamp: -1 });

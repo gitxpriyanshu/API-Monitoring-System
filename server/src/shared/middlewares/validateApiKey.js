@@ -2,10 +2,7 @@ import ResponseFormatter from '../utils/responseFormatter.js';
 import logger from '../config/logger.js';
 import clientContainer from '../../services/client/Dependencies/dependencies.js';
 
-/**
- * Middleware to validate API keys against database
- * Used for external services posting events
- */
+
 const validateApiKey = async (req, res, next) => {
     try {
         const apiKey = req.headers['x-api-key'];
@@ -20,14 +17,14 @@ const validateApiKey = async (req, res, next) => {
                 .json(ResponseFormatter.error('API key is required', 401));
         }
 
-        // Get client and API key from database
+        
         const result = await clientContainer.services.clientServices.getClientByApiKey(apiKey);
 
         if (!result) {
             logger.warn('Invalid API key attempted', {
                 path: req.path,
                 ip: req.ip,
-                apiKey: apiKey.substring(0, 8) + '...', // Log partial key for security
+                apiKey: apiKey.substring(0, 8) + '...', 
             });
             return res
                 .status(403)
@@ -36,7 +33,7 @@ const validateApiKey = async (req, res, next) => {
 
         const { client, apiKey: apiKeyObj } = result;
 
-        // Check if client is active
+        
         if (!client.isActive) {
             logger.warn('Inactive client attempted API access', {
                 path: req.path,
@@ -48,7 +45,7 @@ const validateApiKey = async (req, res, next) => {
                 .json(ResponseFormatter.error('Client account is inactive', 403));
         }
 
-        // Check API key permissions
+        
         if (!apiKeyObj.permissions?.canIngest) {
             logger.warn('API key without ingest permission attempted access', {
                 path: req.path,
@@ -60,7 +57,7 @@ const validateApiKey = async (req, res, next) => {
                 .json(ResponseFormatter.error('API key does not have ingest permissions', 403));
         }
 
-        // Add client and API key info to request
+        
         req.client = client;
         req.apiKey = apiKeyObj;
 

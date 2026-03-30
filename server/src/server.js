@@ -10,21 +10,17 @@ import errorHandler from './shared/middlewares/errorHandler.js';
 import ResponseFormatter from './shared/utils/responseFormatter.js';
 import cookieParser from "cookie-parser"
 
-// Routers
+
 import authRouter from "./services/auth/routes/authRouter.js";
 import clientRouter from './services/client/routes/clientRoutes.js';
 import ingestRouter from "./services/ingest/routes/ingestRoutes.js";
 import analyticsRouter from "./services/analytics/routes/analyticsRoutes.js";
 import { ApiMonitor } from "./shared/utils/apiMonitor.js";
 
-/**
- * Initialize Express app
- */
+
 const app = express();
 
-/**
- * Middlewares
- */
+
 app.use(ApiMonitor({
     apiKey: 'apim_f67819740a4fbe47988d1ad3b7ec9dbd8437d28c',
     serviceName: 'Core-API-Gateway',
@@ -41,10 +37,7 @@ app.use(cookieParser())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-/**
- * Request logging middleware
- * Logs the HTTP method, path, IP address, and user agent for each incoming request.
- */
+
 app.use((req, res, next) => {
     logger.info(`${req.method} ${req.path}`, {
         ip: req.ip,
@@ -53,9 +46,7 @@ app.use((req, res, next) => {
     next()
 })
 
-/**
- * Health check endpoint
- */
+
 app.get('/health', (req, res) => {
     res.status(200).json(
         ResponseFormatter.success(
@@ -69,10 +60,7 @@ app.get('/health', (req, res) => {
     );
 });
 
-/**
- * Root endpoint
- * Provides basic information about the API service and available endpoints.
- */
+
 app.get("/", (req, res) => {
     res.status(200).json(
         ResponseFormatter.success(
@@ -91,37 +79,31 @@ app.get("/", (req, res) => {
     )
 });
 
-/**
- * API Routes
- */
+
 app.use("/api/auth", authRouter);
 app.use("/api/hit", ingestRouter);
 app.use("/api", clientRouter);
 app.use("/api/analytics", analyticsRouter);
 
-/**
- * 404 Handler
- */
+
 app.use((req, res) => {
     res.status(404).json(ResponseFormatter.error("Endpoint not found", 404))
 })
 
 app.use(errorHandler)
 
-/**
- * Initialize database connections and start the server
- */
+
 async function initializeConnection() {
     try {
         logger.info("Initializing database connections...");
 
-        // Connect to MongoDB;
+        
         await mongodb.connect();
 
-        // Connect to PG;
+        
         await postgres.testConnection();
 
-        // Connect to RabbitMQ;
+        
         await rabbitmq.connect();
 
         logger.info("All connections established successfully");
@@ -131,12 +113,7 @@ async function initializeConnection() {
     }
 }
 
-/**
- * Start the Express server after establishing database connections.
- * Also sets up graceful shutdown handlers for SIGINT and SIGTERM signals.
- * On shutdown, it closes the HTTP server and all database connections before exiting the process.
- * If any error occurs during startup or shutdown, it logs the error and exits with a non-zero status code.
- */
+
 async function startServer() {
     try {
         await initializeConnection();
@@ -176,7 +153,7 @@ async function startServer() {
         process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
         process.on("SIGINT", () => gracefulShutdown("SIGINT"));
 
-        // Handle uncaught exceptions
+        
         process.on('uncaughtException', (error) => {
             logger.error('Uncaught Exception:', error);
             gracefulShutdown('uncaughtException');

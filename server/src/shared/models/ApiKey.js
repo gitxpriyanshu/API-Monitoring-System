@@ -1,10 +1,7 @@
 import mongoose from 'mongoose';
 import SecurityUtils from '../utils/SecurityUtils.js';
 
-/**
- * MongoDB schema for API keys
- * Each API key belongs to a client and is used for authentication
- */
+
 const apiKeySchema = new mongoose.Schema(
     {
         keyId: {
@@ -20,7 +17,7 @@ const apiKeySchema = new mongoose.Schema(
             index: true,
         },
         clientId: {
-            type: mongoose.Schema.Types.ObjectId, // 123
+            type: mongoose.Schema.Types.ObjectId, 
             ref: 'Client',
             required: true,
             index: true,
@@ -59,7 +56,7 @@ const apiKeySchema = new mongoose.Schema(
                 trim: true,
             }],
         },
-        // usage and per-key rate limiting removed
+        
         security: {
             allowedIPs: [{
                 type: String,

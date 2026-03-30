@@ -1,16 +1,10 @@
 import ResponseFormatter from "../../../shared/utils/responseFormatter.js"
 
-/**
- * ClientController class to handle client related requests
- */
+
 export class ClientController {
-    /**
-     * Constructor for ClientController
-     * @param {Object} clientService 
-     * @param {Object} authService 
-     */
+    
     constructor(clientService, authService) {
-        // Validate dependencies
+        
         if (!clientService) {
             throw new Error('ClientService is required');
         };
@@ -19,19 +13,13 @@ export class ClientController {
             throw new Error('authService is required');
         };
 
-        // Assign dependencies to instance variables
+        
         this.clientService = clientService;
         this.authService = authService;
     };
 
 
-    /**
-     * Create a new client, only accessible by super admins
-     * @param {Request} req - Express request object
-     * @param {Response} res - Express response object
-     * @param {Function} next - Express next function for error handling
-     * @returns {Promise<Response>} - JSON response with created client data or error message
-     */
+    
     async createClient(req, res, next) {
         try {
             const isSuperAdmin = await this.authService.checkSuperAdminPermissions(req.user.userId);
@@ -47,13 +35,7 @@ export class ClientController {
         }
     }
 
-    /**
-     * Create a new client user for a specific client
-     * @param {Request} req - Express request object
-     * @param {Response} res - Express response object
-     * @param {Function} next - Express next function for error handling
-     * @returns {Promise<Response>} - JSON response with created client user data or error message
-     */
+    
     async createClientUser(req, res, next) {
         try {
             const { clientId } = req.params;
@@ -65,13 +47,7 @@ export class ClientController {
     }
 
 
-    /**
-     * Create a new API key for a specific client
-     * @param {Request} req - Express request object
-     * @param {Response} res - Express response object
-     * @param {Function} next - Express next function for error handling
-     * @returns {Promise<Response>} - JSON response with created API key data or error message
-     */
+    
     async createApiKey(req, res, next) {
         try {
             const clientId = req.params.clientId || req.user.clientId;
@@ -82,9 +58,7 @@ export class ClientController {
         }
     };
 
-    /**
-     * Delete an API key for a specific client
-     */
+    
     async deleteApiKey(req, res, next) {
         try {
             const { keyId } = req.params;
@@ -95,13 +69,7 @@ export class ClientController {
         }
     }
 
-    /**
-     * Get all API keys for a specific client
-     * @param {Request} req - Express request object
-     * @param {Response} res - Express response object
-     * @param {Function} next - Express next function for error handling
-     * @returns {Promise<Response>} - JSON response with fetched API keys data or error message
-     */
+    
     async getClientApiKeys(req, res, next) {
         try {
             const clientId = req.params.clientId || req.user.clientId;
