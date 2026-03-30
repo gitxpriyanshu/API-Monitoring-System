@@ -33,8 +33,9 @@ export class AuthController {
 
             res.cookie("authToken", token, {
                 httpOnly: config.cookie.httpOnly,
-                secure: config.cookie.secure,
-                maxAge: config.cookie.expiresIn
+                secure: true,
+                maxAge: config.cookie.expiresIn,
+                sameSite: 'none'
             });
 
             res.status(201).json(ResponseFormatter.success(user, "Super admin created successfully", 201))
@@ -60,8 +61,9 @@ export class AuthController {
 
             res.cookie("authToken", token, {
                 httpOnly: config.cookie.httpOnly,
-                secure: config.cookie.secure,
-                maxAge: config.cookie.expiresIn
+                secure: true,
+                maxAge: config.cookie.expiresIn,
+                sameSite: 'none'
             });
 
             res.status(201).json(ResponseFormatter.success(user, "User created successfully", 201))
@@ -83,8 +85,9 @@ export class AuthController {
 
             res.cookie("authToken", token, {
                 httpOnly: config.cookie.httpOnly,
-                secure: config.cookie.secure,
-                maxAge: config.cookie.expiresIn
+                secure: true,
+                maxAge: config.cookie.expiresIn,
+                sameSite: 'none'
             });
 
             res.status(200).json(ResponseFormatter.success(user, "User LoggedIn successfully", 200))
@@ -118,7 +121,11 @@ export class AuthController {
      */
     async logout(req, res, next) {
         try {
-            res.clearCookie("authToken")
+            res.clearCookie("authToken", {
+                httpOnly: config.cookie.httpOnly,
+                secure: true,
+                sameSite: 'none'
+            })
             res.status(200).json(ResponseFormatter.success({}, "Logout successful", 200))
         } catch (error) {
             next(error)
