@@ -7,7 +7,7 @@ import Client from '../src/shared/models/Client.js';
 import ApiKey from '../src/shared/models/ApiKey.js';
 import User from '../src/shared/models/User.js';
 
-const INGEST_URL = 'http://localhost:5001/api/hit';
+const INGEST_URL = 'https://api-monitoring-backend-n8ln.onrender.com/api/hit';
 
 const endpoints = [
     { path: '/api/users/login', methods: ['POST'], errorChance: 0.1, maxLatency: 800 },
@@ -24,6 +24,12 @@ async function generateTraffic() {
         console.log('🔌 Connecting to MongoDB to provision Mock Client...');
         await mongoose.connect(config.mongo.uri);
 
+        // 0. Find Admin User
+        const adminUserRecord = await User.findOne({ username: 'admin' });
+        if (!adminUserRecord) {
+            throw new Error('Admin user not found. Run temp-seed.js first.');
+        }
+
         // 1. Create a Mock User & Client
         let mockClient = await Client.findOne({ slug: 'zomato-mock' });
         
@@ -33,7 +39,8 @@ async function generateTraffic() {
                 slug: 'zomato-mock',
                 email: 'engineering@zomato.mock',
                 description: 'Auto-generated mock client for traffic generation',
-                isActive: true
+                isActive: true,
+                createdBy: adminUserRecord._id
             });
             await mockClient.save();
         }

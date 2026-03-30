@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import api from '../api/client';
 import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
-  AreaChart, Area
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
-import { BarChart3, Globe, Shield, Zap } from 'lucide-react';
+import { BarChart3, Shield, Zap } from 'lucide-react';
 import MetricCard from '../components/MetricCard';
 
 export default function Analytics() {

@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import api from '../api/client';
 
 export interface User {
   userId: string;
@@ -7,6 +6,7 @@ export interface User {
   email: string;
   role: string;
   clientId: string;
+  token?: string;
 }
 
 interface AuthContextProps {

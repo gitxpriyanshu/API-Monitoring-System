@@ -38,7 +38,7 @@ export class AuthController {
                 sameSite: 'none'
             });
 
-            res.status(201).json(ResponseFormatter.success(user, "Super admin created successfully", 201))
+            res.status(201).json(ResponseFormatter.success({ ...user, token }, "Super admin created successfully", 201))
         } catch (error) {
             next(error)
         }
@@ -66,7 +66,7 @@ export class AuthController {
                 sameSite: 'none'
             });
 
-            res.status(201).json(ResponseFormatter.success(user, "User created successfully", 201))
+            res.status(201).json(ResponseFormatter.success({ ...user, token }, "User created successfully", 201))
         } catch (error) {
             next(error)
         }
@@ -90,7 +90,7 @@ export class AuthController {
                 sameSite: 'none'
             });
 
-            res.status(200).json(ResponseFormatter.success(user, "User LoggedIn successfully", 200))
+            res.status(200).json(ResponseFormatter.success({ ...user, token }, "User LoggedIn successfully", 200))
         } catch (error) {
             next(error)
         }
