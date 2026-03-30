@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5001/api', // Maps to the API server running on port 5001
+  baseURL: import.meta.env.VITE_API_BASE_URL ? `${import.meta.env.VITE_API_BASE_URL}/api` : 'http://localhost:5000/api',
   withCredentials: true, // Need this to pass cookies for JWT auth
   headers: {
     'Content-Type': 'application/json',
