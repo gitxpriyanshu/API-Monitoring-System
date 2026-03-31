@@ -26,6 +26,11 @@ function ApiMonitor(config) {
     const start = Date.now();
     const originalEnd = res.end;
 
+    // Skip tracking for the ingest endpoint itself to avoid infinite loops
+    if (req.path.includes('/api/hit')) {
+      return next();
+    }
+
     // Attach to the 'end' event to accurately measure latency after response goes out
     res.end = function (chunk, encoding) {
       res.end = originalEnd;

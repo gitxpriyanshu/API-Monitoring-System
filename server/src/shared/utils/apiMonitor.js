@@ -5,8 +5,13 @@ export const ApiMonitor = (config) => {
 
   return async (req, res, next) => {
     const start = Date.now();
-    
     const originalEnd = res.end;
+
+    // Ignore telemetry endpoints to prevent recursive POST loops
+    if (req.path.includes('/api/hit') || req.path.includes('/api/analytics')) {
+      return next();
+    }
+
     res.end = function(chunk, encoding) {
       res.end = originalEnd;
       const result = res.end(chunk, encoding);

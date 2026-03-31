@@ -6,7 +6,7 @@ dotenv.config()
 const config = {
     
     node_env: process.env.NODE_ENV || 'development',
-    port: parseInt(process.env.PORT || "5000", 10),
+    port: parseInt(process.env.PORT || "5001", 10),
 
     
     mongo: {

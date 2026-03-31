@@ -22,9 +22,9 @@ const app = express();
 
 
 app.use(ApiMonitor({
-    apiKey: 'apim_f67819740a4fbe47988d1ad3b7ec9dbd8437d28c',
+    apiKey: 'apim_53947c00c5ccba542e365de484eaee3a0b1b9f4b',
     serviceName: 'Core-API-Gateway',
-    ingestUrl: `http://localhost:5000/api/hit`
+    ingestUrl: `http://localhost:5001/api/hit`
 }));
 
 app.use(helmet());
