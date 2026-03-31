@@ -23,7 +23,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load from local storage on mount (JWT token is in HTTP only cookie, but we store user data locally for UX)
+  
   useEffect(() => {
     try {
       const stored = localStorage.getItem('api-monitor-user');
@@ -45,7 +45,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setUser(null);
     localStorage.removeItem('api-monitor-user');
-    // Call the logout endpoint if needed, but client-side clear is immediate
+    
   };
 
   return (

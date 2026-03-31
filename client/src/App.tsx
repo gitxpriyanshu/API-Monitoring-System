@@ -26,7 +26,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         
-        {/* Dashboard Routes protected by auth */}
+        {}
         <Route 
           path="/" 
           element={
@@ -46,7 +46,7 @@ function App() {
           <Route path="settings" element={<div style={{padding:'2rem'}}>Settings Coming Soon</div>} />
         </Route>
         
-        {/* Fallback */}
+        {}
         <Route path="*" element={<Navigate to="/overview" replace />} />
       </Routes>
     </BrowserRouter>

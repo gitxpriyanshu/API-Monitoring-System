@@ -18,7 +18,7 @@ export default function Errors() {
     setIsLoading(true);
     try {
       const response = await api.get('/analytics/endpoints');
-      // Filter out endpoints with 0 errors
+      
       setData(response.data?.filter((ep: any) => ep.errorHits > 0) || []);
     } catch (err: any) {
       console.error('Failed to load error statistics');

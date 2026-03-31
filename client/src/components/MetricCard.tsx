@@ -93,7 +93,7 @@ export default function MetricCard({ title, value, subtitle, colorHex, icon }: M
 
         .progress-fill {
           height: 100%;
-          width: 75%; /* Simulating progress */
+          width: 75%; 
           border-radius: 0 4px 4px 0;
         }
       `}</style>

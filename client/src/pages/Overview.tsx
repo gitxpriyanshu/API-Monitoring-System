@@ -54,7 +54,7 @@ export default function Overview() {
   if (isLoading) return <div className="loading">Loading dashboard data...</div>;
   if (!metrics) return <div className="loading">No data found</div>;
 
-  // Colors used directly in JSX
+  
 
   return (
     <div className="overview-page">

@@ -11,13 +11,13 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>(() => {
-    // Default to purple (premium dark) if no preference
+    
     const saved = localStorage.getItem('app-theme');
     return (saved as Theme) || 'purple';
   });
 
   useEffect(() => {
-    // Set theme attribute on root HTML element
+    
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('app-theme', theme);
   }, [theme]);

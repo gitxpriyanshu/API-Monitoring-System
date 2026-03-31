@@ -2,13 +2,13 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: (import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') || 'https://api-monitoring-backend-n8ln.onrender.com') + '/api',
-  withCredentials: true, // Need this to pass cookies for JWT auth
+  withCredentials: true, 
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Request interceptor to add the token to the header if available
+
 api.interceptors.request.use(
   (config) => {
     const user = localStorage.getItem('api-monitor-user');
@@ -28,7 +28,7 @@ api.interceptors.response.use(
   (error) => {
     const message = error.response?.data?.message || error.message || 'An error occurred';
     
-    // Redirect to login on 401 Unauthorized
+    
     if (error.response?.status === 401 && window.location.pathname !== '/login') {
       window.location.href = '/login';
     }

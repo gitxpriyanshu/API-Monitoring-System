@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../api/client';
-import { Plus, Trash2, Shield, Globe } from 'lucide-react';
+import { Plus, Trash2, Shield, Globe, Copy, Check, AlertCircle } from 'lucide-react';
 
 interface ApiKey {
   _id: string;
@@ -16,8 +16,10 @@ export default function Keys() {
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
+  const [createdKey, setCreatedKey] = useState<string | null>(null);
+  const [copying, setCopying] = useState(false);
   
-  // New key form state
+  
   const [newName, setNewName] = useState('');
   const [newDesc, setNewDesc] = useState('');
   const [newEnv, setNewEnv] = useState('production');
@@ -38,15 +40,28 @@ export default function Keys() {
     fetchKeys();
   }, []);
 
+  const handleCopy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopying(true);
+      setTimeout(() => setCopying(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy!', err);
+    }
+  };
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setIsCreating(true);
-      await api.post('/keys', {
+      setCreatedKey(null);
+      const response: any = await api.post('/keys', {
         name: newName,
         description: newDesc,
         environment: newEnv
       });
+      
+      setCreatedKey(response.data.keyValue);
       setNewName('');
       setNewDesc('');
       setIsCreating(false);
@@ -78,8 +93,34 @@ export default function Keys() {
         </div>
       </div>
 
+      {createdKey && (
+        <div className="glass-panel success-panel animate-in">
+          <div className="success-header">
+            <div className="status">
+              <Check size={20} className="text-success" />
+              <h3>API Key Generated Successfully!</h3>
+            </div>
+            <button onClick={() => setCreatedKey(null)} className="btn-close">×</button>
+          </div>
+          <p className="warning-text">
+            <AlertCircle size={14} />
+            Make sure to copy your API key now. You won't be able to see it again!
+          </p>
+          <div className="key-display">
+            <code className="full-key">{createdKey}</code>
+            <button 
+              onClick={() => handleCopy(createdKey)} 
+              className={`btn-copy ${copying ? 'copied' : ''}`}
+            >
+              {copying ? <Check size={18} /> : <Copy size={18} />}
+              {copying ? 'Copied' : 'Copy Key'}
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="keys-container">
-        {/* Create Key Section */}
+        {}
         <div className="glass-panel create-key-card">
           <h3>Generate New Key</h3>
           <form onSubmit={handleCreate} className="create-form">
@@ -118,7 +159,7 @@ export default function Keys() {
           </form>
         </div>
 
-        {/* Keys List */}
+        {}
         <div className="keys-list glass-panel">
           <div className="list-header">
             <h3>Active Keys</h3>
@@ -375,6 +416,99 @@ export default function Keys() {
           padding: 40px;
           text-align: center;
           color: var(--text-muted);
+        }
+
+        .success-panel {
+          border-left: 4px solid #10b981;
+          padding: 24px;
+          margin-bottom: 24px;
+        }
+
+        .success-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          margin-bottom: 12px;
+        }
+
+        .success-header .status {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .success-header h3 {
+          font-size: 18px;
+          font-weight: 600;
+          color: #10b981;
+        }
+
+        .btn-close {
+          background: none;
+          border: none;
+          color: var(--text-muted);
+          font-size: 24px;
+          cursor: pointer;
+          line-height: 1;
+        }
+
+        .warning-text {
+          font-size: 13px;
+          color: #f59e0b;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin-bottom: 20px;
+        }
+
+        .key-display {
+          display: flex;
+          gap: 12px;
+          align-items: stretch;
+          background: rgba(0,0,0,0.2);
+          padding: 4px;
+          border-radius: 12px;
+        }
+
+        .full-key {
+          flex: 1;
+          padding: 12px 20px;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 14px;
+          color: #a5b4fc;
+          overflow-x: auto;
+          white-space: nowrap;
+        }
+
+        .btn-copy {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 0 20px;
+          background: rgba(255,255,255,0.05);
+          color: white;
+          border-radius: 8px;
+          font-size: 13px;
+          font-weight: 600;
+          transition: all 0.2s;
+        }
+
+        .btn-copy:hover {
+          background: rgba(255,255,255,0.1);
+        }
+
+        .btn-copy.copied {
+          background: #10b981;
+          color: white;
+        }
+
+        .animate-in {
+          animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+          from { transform: translateY(-20px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
         }
       `}</style>
     </div>

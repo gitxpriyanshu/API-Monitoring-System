@@ -9,7 +9,7 @@ export default function DashboardLayout() {
       <main className="main-content">
         <Header />
         
-        {/* Child routes load inside this animated container */}
+        {}
         <div className="content-container slide-up">
           <Outlet />
         </div>
