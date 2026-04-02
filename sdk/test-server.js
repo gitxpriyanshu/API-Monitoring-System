@@ -5,7 +5,7 @@ const app = express();
 
 // Use the SDK middleware with a test config to point to the local server
 app.use(ApiMonitor({
-    apiKey: 'apim_53947c00c5ccba542e365de484eaee3a0b1b9f4b', // Validated API key from Dashboard
+    apiKey: 'apim_6bacc0a0c661a20cb809d2020f5811386a98e2c1', // Validated API key from Dashboard
     serviceName: 'Zomato-Dummy-Backend',
     ingestUrl: 'http://localhost:5001/api/hit',
     debug: true

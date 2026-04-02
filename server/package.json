@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node src/services/processor/consumer.js & node src/server.js",
-    "dev": "nodemon src/server.js",
+    "dev": "node src/services/processor/consumer.js & nodemon src/server.js",
     "processor": "node src/services/processor/consumer.js",
     "init": "node init-system.js",
     "init:env": "node init-system.js --generate-env"
@@ -32,6 +32,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.0.0",
     "pg": "^8.11.3",
+    "socket.io": "^4.8.3",
     "uuid": "^9.0.1",
     "winston": "^3.11.0"
   },

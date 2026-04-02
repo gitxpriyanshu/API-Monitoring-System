@@ -22,14 +22,14 @@ const app = express();
 
 
 app.use(ApiMonitor({
-    apiKey: 'apim_53947c00c5ccba542e365de484eaee3a0b1b9f4b',
+    apiKey: 'apim_6bacc0a0c661a20cb809d2020f5811386a98e2c1',
     serviceName: 'Core-API-Gateway',
     ingestUrl: `http://localhost:5001/api/hit`
 }));
 
 app.use(helmet());
 app.use(cors({
-    origin: ['https://client-orcin-pi.vercel.app', 'http://localhost:5173'],
+    origin: ['https://client-orcin-pi.vercel.app', 'http://localhost:5173', 'http://localhost:5174'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key']
 }));
@@ -97,13 +97,13 @@ async function initializeConnection() {
     try {
         logger.info("Initializing database connections...");
 
-        
+
         await mongodb.connect();
 
-        
+
         await postgres.testConnection();
 
-        
+
         await rabbitmq.connect();
 
         logger.info("All connections established successfully");
@@ -153,7 +153,7 @@ async function startServer() {
         process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
         process.on("SIGINT", () => gracefulShutdown("SIGINT"));
 
-        
+
         process.on('uncaughtException', (error) => {
             logger.error('Uncaught Exception:', error);
             gracefulShutdown('uncaughtException');
