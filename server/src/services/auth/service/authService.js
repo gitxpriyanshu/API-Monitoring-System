@@ -7,11 +7,12 @@ import { APPLICATION_ROLES } from "../../../shared/constants/roles.js";
 
 
 export class AuthService {
-    constructor(userRepository) {
+    constructor(userRepository, clientRepository) {
         if (!userRepository) {
             throw new Error("UserRepository is Required");
         }
         this.userRepository = userRepository;
+        this.clientRepository = clientRepository;
     };
 
     
@@ -82,11 +83,31 @@ export class AuthService {
                 throw new AppError("Email already exists", 409)
             };
 
+            
+            if (userData.role !== APPLICATION_ROLES.SUPER_ADMIN && !userData.clientId) {
+                if (!this.clientRepository) {
+                    throw new Error("ClientRepository is required for user registration");
+                }
+
+                const clientName = `${userData.username}'s Workspace`;
+                const slug = clientName.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+                
+                const client = await this.clientRepository.create({
+                    name: clientName,
+                    slug: `${slug}-${Date.now()}`,
+                    email: userData.email,
+                    description: `Default workspace for ${userData.username}`
+                });
+
+                userData.clientId = client._id;
+            }
+
             const user = await this.userRepository.create(userData);
             const token = this.generateToken(user);
 
             logger.info("User registered successfully", {
-                username: user.username
+                username: user.username,
+                clientId: user.clientId
             })
 
             return {

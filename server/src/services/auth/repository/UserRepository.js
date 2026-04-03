@@ -21,6 +21,14 @@ class MongoUserRepository extends BaseRepository {
                     canExportData: true,
                 }
             }
+            if (data.role === "client_admin" && !data.permissions) {
+                data.permissions = {
+                    canCreateApiKeys: true,
+                    canManageUsers: true,
+                    canViewAnalytics: true,
+                    canExportData: true,
+                }
+            }
 
             const user = new this.model(data);
             await user.save();

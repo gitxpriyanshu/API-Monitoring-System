@@ -52,9 +52,103 @@ export default function Overview() {
   }, []);
 
   if (isLoading) return <div className="loading">Loading dashboard data...</div>;
-  if (!metrics) return <div className="loading">No data found</div>;
-
   
+  if (!metrics || metrics.totalHits === 0) {
+    return (
+      <div className="overview-page empty">
+        <div className="empty-state-card glass-panel animate-in">
+          <div className="empty-icon">🚀</div>
+          <h1>Welcome to API Monitor!</h1>
+          <p>You're all set up. Now let's start tracking your first API.</p>
+          
+          <div className="steps-list">
+            <div className="step">
+              <div className="step-num">1</div>
+              <div className="step-content">
+                <h3>Generate an API Key</h3>
+                <p>Go to the <strong>Keys</strong> page and create your first access token.</p>
+              </div>
+            </div>
+            <div className="step">
+              <div className="step-num">2</div>
+              <div className="step-content">
+                <h3>Integrate with your App</h3>
+                <p>Send a POST request to <code>{window.location.origin}/api/hit</code> with your API key in the headers.</p>
+              </div>
+            </div>
+            <div className="step">
+              <div className="step-num">3</div>
+              <div className="step-content">
+                <h3>Watch Real-time Data</h3>
+                <p>Once your first request hits our servers, data will appear here instantly!</p>
+              </div>
+            </div>
+          </div>
+
+          <button className="btn-primary" onClick={() => window.location.href='/keys'}>
+            Go to API Keys →
+          </button>
+        </div>
+
+        <style>{`
+          .overview-page.empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 70vh;
+          }
+          .empty-state-card {
+            max-width: 600px;
+            padding: 3rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+          }
+          .empty-icon { font-size: 4rem; margin-bottom: 1rem; }
+          .empty-state-card h1 { font-size: 2rem; }
+          .empty-state-card p { color: var(--text-secondary); }
+          
+          .steps-list {
+            width: 100%;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin: 2rem 0;
+          }
+          .step {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+          }
+          .step-num {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+          }
+          .step-content h3 { font-size: 1.1rem; margin-bottom: 0.25rem; }
+          .step-content p { font-size: 0.9rem; }
+          
+          .animate-in {
+            animation: slideUp 0.5s ease-out;
+          }
+          @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        `}</style>
+      </div>
+    );
+  }
 
   return (
     <div className="overview-page">

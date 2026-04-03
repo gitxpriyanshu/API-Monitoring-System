@@ -26,8 +26,12 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    const message = error.response?.data?.message || error.message || 'An error occurred';
-    
+    const data = error.response?.data;
+    // If there's a list of validation errors, join them for display
+    const details = Array.isArray(data?.errors) && data.errors.length > 0
+      ? data.errors.join('. ')
+      : null;
+    const message = details || data?.message || error.message || 'An error occurred';
     
     if (error.response?.status === 401 && window.location.pathname !== '/login') {
       window.location.href = '/login';

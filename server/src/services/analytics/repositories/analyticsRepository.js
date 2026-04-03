@@ -207,7 +207,17 @@ class AnalyticsRepository {
     }
 
     async getRecentHits(clientId, limit = 50) {
-        return await ApiHit.find({ clientId: new mongoose.Types.ObjectId(clientId) })
+        if (!clientId) return [];
+        
+        let mongoClientId;
+        try {
+            mongoClientId = new mongoose.Types.ObjectId(clientId);
+        } catch (error) {
+            logger.error('Invalid clientId for MongoDB query', { clientId });
+            return [];
+        }
+
+        return await ApiHit.find({ clientId: mongoClientId })
             .sort({ timestamp: -1 })
             .limit(parseInt(limit, 10))
             .lean();

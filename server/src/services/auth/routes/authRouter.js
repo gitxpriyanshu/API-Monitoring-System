@@ -17,12 +17,20 @@ router.post("/onboard-super-admin",
     (req, res, next) => authController.onboardSuperAdmin(req, res, next)
 )
 
+// Admin-only route: register user with any role
 router.post("/register",
     requestLogger,
     authenticate,
     authorize([APPLICATION_ROLES.SUPER_ADMIN]),
     validate(registrationSchema),
     (req, res, next) => authController.register(req, res, next)
+)
+
+// Public route: any user can self-register, always assigned client_viewer role
+router.post("/signup",
+    requestLogger,
+    validate(registrationSchema),
+    (req, res, next) => authController.signup(req, res, next)
 )
 
 router.post("/login",

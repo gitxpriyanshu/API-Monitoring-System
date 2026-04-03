@@ -59,6 +59,29 @@ export class AuthController {
         }
     };
 
+    // Public signup — create a client admin for their own workspace
+    async signup(req, res, next) {
+        try {
+            const { username, email, password } = req.body;
+            const userData = {
+                username, email, password, role: APPLICATION_ROLES.CLIENT_ADMIN
+            };
+
+            const { token, user } = await this.authService.register(userData);
+
+            res.cookie("authToken", token, {
+                httpOnly: config.cookie.httpOnly,
+                secure: true,
+                maxAge: config.cookie.expiresIn,
+                sameSite: 'none'
+            });
+
+            res.status(201).json(ResponseFormatter.success({ ...user, token }, "Account created successfully", 201))
+        } catch (error) {
+            next(error)
+        }
+    };
+
     
     async login(req, res, next) {
         try {

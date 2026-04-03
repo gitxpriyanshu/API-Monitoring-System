@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import api from '../api/client';
 
 export interface User {
   userId: string;
@@ -42,10 +43,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('api-monitor-user', JSON.stringify(userData));
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await api.get('/auth/logout');
+    } catch (e) {
+      console.error('Backend logout failed', e);
+    }
     setUser(null);
     localStorage.removeItem('api-monitor-user');
-    
   };
 
   return (

@@ -10,6 +10,7 @@ import Realtime from './pages/Realtime';
 
 import Analytics from './pages/Analytics';
 import Keys from './pages/Keys';
+import Settings from './pages/Settings';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -25,6 +26,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Login />} />
         
         {}
         <Route 
@@ -43,7 +45,7 @@ function App() {
           <Route path="endpoints" element={<Endpoints />} />
           <Route path="errors" element={<Errors />} />
           <Route path="keys" element={<Keys />} />
-          <Route path="settings" element={<div style={{padding:'2rem'}}>Settings Coming Soon</div>} />
+          <Route path="settings" element={<Settings />} />
         </Route>
         
         {}

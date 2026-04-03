@@ -7,14 +7,19 @@ import { BarChart3, Shield, Zap } from 'lucide-react';
 import MetricCard from '../components/MetricCard';
 
 export default function Analytics() {
-  const [data, setData] = useState<any>(null);
+  const [overview, setOverview] = useState<any>(null);
+  const [performance, setPerformance] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const response = await api.get('/analytics/overview');
-        setData(response.data);
+        const [ovRes, perfRes]: [any, any] = await Promise.all([
+          api.get('/analytics/overview'),
+          api.get('/analytics/performance')
+        ]);
+        setOverview(ovRes.data);
+        setPerformance(perfRes.data || []);
       } catch (err) {
         console.error('Failed to load analytics');
       } finally {
@@ -26,6 +31,17 @@ export default function Analytics() {
 
   if (isLoading) return <div className="loading">Processing analytics...</div>;
 
+  // Prepare chart data from real performance metrics
+  const chartData = performance.length > 0 
+    ? performance.slice(0, 6).map(p => ({
+        name: p.endpoint.length > 20 ? p.endpoint.substring(0, 17) + '...' : p.endpoint,
+        latency: p.avgLatency,
+        service: p.serviceName
+      }))
+    : [
+        { name: 'No Data', latency: 0, service: '' },
+      ];
+
   return (
     <div className="analytics-page">
       <div className="page-header">
@@ -36,39 +52,34 @@ export default function Analytics() {
       <div className="analytics-grid">
         <div className="metric-row">
           <MetricCard 
-            title="Avg Time to First Byte" 
-            value={`${(data?.avgLatency * 0.4).toFixed(0)}ms`} 
-            subtitle="Network performance" 
+            title="Avg Latency" 
+            value={`${overview?.avgLatency?.toFixed(1) || 0}ms`} 
+            subtitle="Response time" 
             colorHex="#10b981" 
             icon={<Zap size={20} />} 
           />
           <MetricCard 
-            title="Max Service Latency" 
-            value={`${(data?.avgLatency * 2.5).toFixed(0)}ms`} 
-            subtitle="Current peak" 
+            title="Total Services" 
+            value={overview?.uniqueServices || 0} 
+            subtitle="Active infrastructure" 
             colorHex="#f59e0b" 
             icon={<BarChart3 size={20} />} 
           />
            <MetricCard 
-            title="Security Score" 
-            value="98.2" 
-            subtitle="Risk assessment" 
+            title="Success Rate" 
+            value={`${overview?.successRate?.toFixed(1) || 100}%`} 
+            subtitle="Availability" 
             colorHex="#6366f1" 
             icon={<Shield size={20} />} 
           />
         </div>
 
         <div className="visual-section glass-panel">
-          <h3>Service Performance Breakdown</h3>
-          <p className="section-desc">Comparing latency across your infrastructure</p>
+          <h3>Endpoint Performance Breakdown</h3>
+          <p className="section-desc">Comparing average latency (ms) across your top endpoints</p>
           <div className="chart-wrapper">
             <ResponsiveContainer width="100%" height={300}>
-               <BarChart data={[
-                 { name: 'API Server', latency: data?.avgLatency },
-                 { name: 'Auth Module', latency: data?.avgLatency * 0.8 },
-                 { name: 'User Service', latency: data?.avgLatency * 1.2 },
-                 { name: 'Payments', latency: data?.avgLatency * 2.1 }
-               ]}>
+               <BarChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                 <XAxis 
                   dataKey="name" 
