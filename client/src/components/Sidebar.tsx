@@ -1,12 +1,12 @@
 import { NavLink } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  BarChart3, 
+import {
+  LayoutDashboard,
+  BarChart3,
   Key,
-  Activity, 
-  Gauge, 
-  Link2, 
-  XCircle, 
+  Activity,
+  Gauge,
+  Link2,
+  XCircle,
   Settings,
   Zap
 } from 'lucide-react';
@@ -15,7 +15,7 @@ export default function Sidebar() {
   const routes = [
     { path: '/overview', label: 'Overview', icon: <LayoutDashboard size={18} /> },
     { path: '/analytics', label: 'Analytics', icon: <BarChart3 size={18} /> },
-    { path: '/keys', label: 'API Keys', icon: <Key size={18} /> }, 
+    { path: '/keys', label: 'API Keys', icon: <Key size={18} /> },
     { path: '/realtime', label: 'Real-time', icon: <Activity size={18} /> },
     { path: '/performance', label: 'Performance', icon: <Gauge size={18} /> },
     { path: '/endpoints', label: 'Endpoints', icon: <Link2 size={18} /> },
@@ -29,15 +29,15 @@ export default function Sidebar() {
           <Zap size={22} fill="white" />
         </div>
         <div className="brand">
-          <h3>API Monitor v1.1</h3>
-          <span>By Code Architecture</span>
+          <h3>API Monitor</h3>
+          <span>By Priyanshu Verma</span>
         </div>
       </div>
 
       <nav className="sidebar-nav">
         {routes.map(r => (
-          <NavLink 
-            key={r.path} 
+          <NavLink
+            key={r.path}
             to={r.path}
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
           >

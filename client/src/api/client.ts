@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: (import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') || 'http://localhost:5001') + '/api',
-  withCredentials: true, 
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -18,7 +18,7 @@ api.interceptors.request.use(
         if (u.token) {
           config.headers.Authorization = `Bearer ${u.token}`;
         }
-      } catch (e) {}
+      } catch (e) { }
     }
     return config;
   }
@@ -26,17 +26,13 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    const data = error.response?.data;
-    // If there's a list of validation errors, join them for display
-    const details = Array.isArray(data?.errors) && data.errors.length > 0
-      ? data.errors.join('. ')
-      : null;
-    const message = details || data?.message || error.message || 'An error occurred';
-    
+    const message = error.response?.data?.message || error.message || 'An error occurred';
+
+
     if (error.response?.status === 401 && window.location.pathname !== '/login') {
       window.location.href = '/login';
     }
-    
+
     return Promise.reject(new Error(message));
   }
 );
